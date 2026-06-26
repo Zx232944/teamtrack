@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛队管家 TeamTrack - 大学生竞赛协作管理应用</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-orange-light: #FF8C5A;
+            --secondary-blue: #1E90FF;
+            --dark-bg: #0F0F1A;
+            --dark-card: #1A1A2E;
+            --dark-card-hover: #252540;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0B0;
+            --accent-green: #00D4AA;
+            --accent-yellow: #FFD700;
+            --accent-red: #FF4757;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f1a 100%);
+            position: relative;
+        }
+
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 107, 53, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(30, 144, 255, 0.1) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-orange);
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 24px 60px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .hero-text h1 span {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-primary {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-orange-light));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(255, 107, 53, 0.6);
+        }
+
+        .btn-secondary {
+            padding: 14px 32px;
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .mockup-phone {
+            width: 320px;
+            height: 650px;
+            background: var(--dark-card);
+            border-radius: 40px;
+            border: 8px solid #2a2a40;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .mockup-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            border-radius: 32px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mockup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .mockup-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-orange);
+        }
+
+        .mockup-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--dark-card-hover);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-orange);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .mockup-progress {
+            background: var(--dark-card-hover);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-orange), var(--accent-green));
+            border-radius: 4px;
+            animation: progress 2s ease-out forwards;
+        }
+
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 73%; }
+        }
+
+        .mockup-tasks {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            background: var(--dark-card-hover);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .task-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .task-icon.orange { background: rgba(255, 107, 53, 0.2); color: var(--primary-orange); }
+        .task-icon.blue { background: rgba(30, 144, 255, 0.2); color: var(--secondary-blue); }
+        .task-icon.green { background: rgba(0, 212, 170, 0.2); color: var(--accent-green); }
+
+        .task-info {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .task-meta {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .task-status {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .task-status.completed { background: rgba(0, 212, 170, 0.2); color: var(--accent-green); }
+        .task-status.in-progress { background: rgba(255, 215, 0, 0.2); color: var(--accent-yellow); }
+
+        .features-section {
+            padding: 80px 24px;
+            background: var(--dark-bg);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--dark-card);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 107, 53, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .problems-section {
+            padding: 80px 24px;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #1a1a2e 100%);
+        }
+
+        .problems-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .problem-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .problem-item {
+            display: flex;
+            gap: 20px;
+            padding: 24px;
+            background: var(--dark-card);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .problem-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 71, 87, 0.15);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .problem-text h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .problem-text p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .solution-image {
+            position: relative;
+        }
+
+        .solution-card {
+            background: var(--dark-card);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .solution-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--accent-green);
+        }
+
+        .solution-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .solution-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .solution-check {
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 212, 170, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-green);
+            font-size: 12px;
+        }
+
+        .solution-text {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .stats-section {
+            padding: 80px 24px;
+            background: var(--dark-bg);
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 32px;
+            background: var(--dark-card);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .workflow-section {
+            padding: 80px 24px;
+            background: linear-gradient(180deg, var(--dark-bg) 0%, #1a1a2e 100%);
+        }
+
+        .workflow-timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .workflow-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary-orange), var(--secondary-blue));
+            transform: translateX(-50%);
+        }
+
+        .workflow-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 48px;
+        }
+
+        .workflow-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .workflow-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .workflow-content {
+            width: calc(50% - 40px);
+            background: var(--dark-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .workflow-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            z-index: 1;
+        }
+
+        .workflow-number {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            background: var(--dark-bg);
+            border: 2px solid var(--primary-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 2;
+        }
+
+        .workflow-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .workflow-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .target-section {
+            padding: 80px 24px;
+            background: var(--dark-bg);
+        }
+
+        .target-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .target-image {
+            position: relative;
+        }
+
+        .target-card {
+            background: var(--dark-card);
+            border-radius: 20px;
+            padding: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .target-card h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--secondary-blue);
+        }
+
+        .target-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .target-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .target-bullet {
+            width: 8px;
+            height: 8px;
+            background: var(--secondary-blue);
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+        }
+
+        .target-text {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .footer-section {
+            padding: 60px 24px 32px;
+            background: var(--dark-bg);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .footer-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .footer-logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer-col h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-orange);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 32px;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .mockup-phone {
+                width: 280px;
+                height: 560px;
+                margin: 0 auto;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .problems-content, .target-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .workflow-timeline::before {
+                left: 24px;
+            }
+
+            .workflow-item {
+                flex-direction: column !important;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .workflow-content {
+                width: 100%;
+                margin-left: 48px;
+            }
+
+            .workflow-number {
+                left: 24px;
+                transform: translateX(-50%);
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <div class="logo">
+                <div class="logo-icon">T</div>
+                <span class="logo-text">TeamTrack</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">核心功能</a></li>
+                <li><a href="#problems">痛点分析</a></li>
+                <li><a href="#workflow">使用流程</a></li>
+                <li><a href="#target">目标用户</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="hero-section gradient-bg">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>赛队管家<br><span>让竞赛协作更高效</span></h1>
+                <p>专为大学生竞赛团队打造的轻量级协作管理工具，解决进度不透明、责任推诿、队长一人焦虑的痛点，让团队管理不再依赖人情。</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary">立即体验</button>
+                    <button class="btn-secondary">了解更多</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="mockup-phone">
+                    <div class="mockup-screen">
+                        <div class="mockup-header">
+                            <span class="mockup-title">🚀 竞赛进度</span>
+                            <span style="font-size: 12px; color: var(--text-secondary)">互联网+大赛</span>
+                        </div>
+                        <div class="mockup-stats">
+                            <div class="stat-card">
+                                <div class="stat-value">23</div>
+                                <div class="stat-label">总任务</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">17</div>
+                                <div class="stat-label">已完成</div>
+                            </div>
+                        </div>
+                        <div class="mockup-progress">
+                            <div class="progress-header">
+                                <span>整体进度</span>
+                                <span style="color: var(--primary-orange); font-weight: 600">73%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                        </div>
+                        <div class="mockup-tasks">
+                            <div class="task-item">
+                                <div class="task-icon orange">📝</div>
+                                <div class="task-info">
+                                    <div class="task-title">商业计划书撰写</div>
+                                    <div class="task-meta">张三 · 剩余2天</div>
+                                </div>
+                                <span class="task-status in-progress">进行中</span>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-icon blue">🎨</div>
+                                <div class="task-info">
+                                    <div class="task-title">产品UI设计</div>
+                                    <div class="task-meta">李四 · 已完成</div>
+                                </div>
+                                <span class="task-status completed">已完成</span>
+                            </div>
+                            <div class="task-item">
+                                <div class="task-icon green">💻</div>
+                                <div class="task-info">
+                                    <div class="task-title">原型开发</div>
+                                    <div class="task-meta">王五 · 剩余5天</div>
+                                </div>
+                                <span class="task-status in-progress">进行中</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <div class="section-header">
+            <h2 class="section-title">核心功能模块</h2>
+            <p class="section-subtitle">集任务抽签、进度打卡、贡献举证于一体，打造高效协作闭环</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">任务抢单</h3>
+                <p class="feature-description">队员自主领取任务，支持条件筛选，打破传统分配模式，激发主动性和责任感。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">进度追踪</h3>
+                <p class="feature-description">实时可视化进度看板，队长一目了然，及时发现问题并调整策略。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3 class="feature-title">贡献举证</h3>
+                <p class="feature-description">交付物留痕，版本记录自动生成，量化个人贡献，让付出有迹可循。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h3 class="feature-title">贡献排行</h3>
+                <p class="feature-description">基于数据的公平排名，利用同辈压力激发团队活力，营造积极向上的氛围。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3 class="feature-title">团队管理</h3>
+                <p class="feature-description">灵活的角色分配，清晰的权限管理，让团队协作更加有序高效。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3 class="feature-title">智能提醒</h3>
+                <p class="feature-description">关键节点自动提醒，Deadline倒计时，确保任务按时完成。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="problems-section" id="problems">
+        <div class="problems-content">
+            <div class="problem-list">
+                <div class="problem-item">
+                    <div class="problem-icon">😰</div>
+                    <div class="problem-text">
+                        <h3>进度不透明</h3>
+                        <p>队长需要花大量精力在群里催进度，对质"到底做没做完"，效率低下。</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <div class="problem-icon">🤝</div>
+                    <div class="problem-text">
+                        <h3>责任推诿</h3>
+                        <p>队员只扫门前雪，遇到问题互相推诿，导致团队内耗严重。</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <div class="problem-icon">😓</div>
+                    <div class="problem-text">
+                        <h3>队长焦虑</h3>
+                        <p>队长一人扛起所有压力，变成"保姆"角色，无法专注于技术方案本身。</p>
+                    </div>
+                </div>
+                <div class="problem-item">
+                    <div class="problem-icon">💼</div>
+                    <div class="problem-text">
+                        <h3>工具不适配</h3>
+                        <p>现有办公软件太重、太像上班，学生根本不爱用，急需懂学生场景的轻量工具。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="solution-image">
+                <div class="solution-card">
+                    <h3>✨ 解决方案</h3>
+                    <div class="solution-list">
+                        <div class="solution-item">
+                            <div class="solution-check">✓</div>
+                            <span class="solution-text">任务抢单机制，激发主动性</span>
+                        </div>
+                        <div class="solution-item">
+                            <div class="solution-check">✓</div>
+                            <span class="solution-text">交付物留痕，贡献可量化</span>
+                        </div>
+                        <div class="solution-item">
+                            <div class="solution-check">✓</div>
+                            <span class="solution-text">数据驱动决策，减少人情管理</span>
+                        </div>
+                        <div class="solution-item">
+                            <div class="solution-check">✓</div>
+                            <span class="solution-text">微信生态集成，轻量化体验</span>
+                        </div>
+                        <div class="solution-item">
+                            <div class="solution-check">✓</div>
+                            <span class="solution-text">贡献排行榜，营造良性竞争</span>
+                        </div>
+                        <div class="solution-item">
+                            <div class="solution-check">✓</div>
+                            <span class="solution-text">智能提醒，确保按时交付</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">85%</div>
+                <div class="stat-desc">进度追踪效率提升</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">60%</div>
+                <div class="stat-desc">队长管理时间减少</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">92%</div>
+                <div class="stat-desc">团队协作满意度</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3x</div>
+                <div class="stat-desc">任务完成速度提升</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="workflow-section" id="workflow">
+        <div class="section-header">
+            <h2 class="section-title">使用流程</h2>
+            <p class="section-subtitle">从项目启动到竞赛提交，全程高效协作</p>
+        </div>
+        <div class="workflow-timeline">
+            <div class="workflow-item">
+                <div class="workflow-icon">👤</div>
+                <div class="workflow-content">
+                    <h3 class="workflow-title">创建团队</h3>
+                    <p class="workflow-desc">队长创建团队，设置竞赛信息，邀请成员加入。</p>
+                </div>
+                <div class="workflow-number">1</div>
+            </div>
+            <div class="workflow-item">
+                <div class="workflow-icon">📝</div>
+                <div class="workflow-content">
+                    <h3 class="workflow-title">发布任务</h3>
+                    <p class="workflow-desc">队长创建任务，设置截止时间和分值，任务进入待领取状态。</p>
+                </div>
+                <div class="workflow-number">2</div>
+            </div>
+            <div class="workflow-item">
+                <div class="workflow-icon">🎯</div>
+                <div class="workflow-content">
+                    <h3 class="workflow-title">队员抢单</h3>
+                    <p class="workflow-desc">队员浏览任务列表，自主领取感兴趣的任务。</p>
+                </div>
+                <div class="workflow-number">3</div>
+            </div>
+            <div class="workflow-item">
+                <div class="workflow-icon">📤</div>
+                <div class="workflow-content">
+                    <h3 class="workflow-title">提交交付物</h3>
+                    <p class="workflow-desc">队员完成任务后上传交付物，系统自动记录版本和贡献度。</p>
+                </div>
+                <div class="workflow-number">4</div>
+            </div>
+            <div class="workflow-item">
+                <div class="workflow-icon">📊</div>
+                <div class="workflow-content">
+                    <h3 class="workflow-title">进度追踪</h3>
+                    <p class="workflow-desc">队长实时查看团队进度，根据数据调整策略，确保项目顺利推进。</p>
+                </div>
+                <div class="workflow-number">5</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="target-section" id="target">
+        <div class="section-header">
+            <h2 class="section-title">目标用户与场景</h2>
+            <p class="section-subtitle">专注大学生竞赛场景，助力团队取得优异成绩</p>
+        </div>
+        <div class="target-content">
+            <div class="target-image">
+                <div class="target-card">
+                    <h3>🎯 面向用户</h3>
+                    <div class="target-list">
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">参加"互联网+"大赛的本科/研究生团队</span>
+                        </div>
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">参与"挑战杯"系列竞赛的学生团队</span>
+                        </div>
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">数学建模竞赛参赛队伍</span>
+                        </div>
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">各类学科竞赛、创新创业大赛团队</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="target-image">
+                <div class="target-card">
+                    <h3>📅 使用场景</h3>
+                    <div class="target-list">
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">项目启动阶段：团队组建与任务分工</span>
+                        </div>
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">中期检查阶段：进度把控与问题排查</span>
+                        </div>
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">Deadline前：高压赶工与冲刺阶段</span>
+                        </div>
+                        <div class="target-item">
+                            <div class="target-bullet"></div>
+                            <span class="target-text">赛后复盘：贡献评估与经验总结</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero-section gradient-bg" style="min-height: auto; padding: 80px 24px;">
+        <div class="hero-content" style="grid-template-columns: 1fr; text-align: center;">
+            <div class="hero-text">
+                <h1>开启高效协作之旅</h1>
+                <p>加入赛队管家，让你的竞赛团队更有战斗力！</p>
+                <div class="hero-buttons" style="justify-content: center;">
+                    <button class="btn-primary">立即体验</button>
+                    <button class="btn-secondary">联系我们</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-section">
+        <div class="footer-content">
+            <div class="footer-col">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">T</div>
+                    <span class="footer-logo-text">TeamTrack</span>
+                </div>
+                <p class="footer-desc">赛队管家 - 专为大学生竞赛团队打造的轻量级协作管理工具。让管理不再依赖人情，让协作更高效。</p>
+            </div>
+            <div class="footer-col">
+                <h4>产品</h4>
+                <ul class="footer-links">
+                    <li><a href="#features">核心功能</a></li>
+                    <li><a href="#workflow">使用流程</a></li>
+                    <li><a href="#target">目标用户</a></li>
+                    <li><a href="#">更新日志</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>资源</h4>
+                <ul class="footer-links">
+                    <li><a href="#">帮助中心</a></li>
+                    <li><a href="#">使用指南</a></li>
+                    <li><a href="#">案例分享</a></li>
+                    <li><a href="#">常见问题</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>关于</h4>
+                <ul class="footer-links">
+                    <li><a href="#">团队介绍</a></li>
+                    <li><a href="#">联系我们</a></li>
+                    <li><a href="#">加入我们</a></li>
+                    <li><a href="#">隐私政策</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TeamTrack 赛队管家. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card, .problem-item, .stat-item, .workflow-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
