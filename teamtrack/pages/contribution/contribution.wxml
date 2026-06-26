@@ -1,0 +1,148 @@
+<!--pages/contribution/contribution.wxml-->
+<view class="page">
+  <!-- 未登录提示 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-prompt">
+    <view class="login-avatar-placeholder">👤</view>
+    <text class="login-title">登录后查看贡献</text>
+    <text class="login-desc text-secondary">请先登录以使用赛队管家</text>
+    <navigator url="/pages/profile/profile" open-type="switchTab" class="btn-primary login-btn">去登录</navigator>
+  </view>
+
+  <block wx:else>
+    <!-- 团队切换条 -->
+    <view class="team-switcher">
+      <view class="team-chip-manage" bindtap="goTeamsPage">
+        <text class="team-chip-manage-icon">≡</text>
+        <text>管理</text>
+      </view>
+      <scroll-view scroll-x class="team-switcher-scroll" enhanced show-scrollbar="{{false}}">
+        <view wx:for="{{teams}}" wx:key="_id"
+          class="team-chip {{item.isActive ? 'active' : ''}}"
+          bindtap="onSwitchTeam" data-id="{{item._id}}">
+          <view class="team-chip-dot"></view>
+          <text>{{item.name}}</text>
+          <text wx:if="{{item.isCaptain}}" class="team-chip-captain">队长</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 无团队提示 -->
+    <view wx:if="{{!hasTeams}}" class="team-empty-hint">
+      还没有团队，贡献数据需要先加入团队
+    </view>
+
+    <block wx:if="{{hasTeams}}">
+    <!-- 个人贡献概览（当前团队） -->
+    <view class="contribution-header">
+      <view class="user-card">
+        <view class="user-avatar">{{user.nickName ? user.nickName[0] : '我'}}</view>
+        <view class="user-info">
+          <text class="user-name">{{user.nickName || '我'}}</text>
+          <text class="user-role tag tag-orange">{{myRole === 'captain' ? '队长' : '队员'}}</text>
+        </view>
+        <view class="user-score">
+          <text class="score-num text-orange">{{myContribution}}</text>
+          <text class="score-label text-xs text-secondary">本团队贡献</text>
+        </view>
+      </view>
+
+      <!-- 贡献统计卡片 -->
+      <view class="stats-cards">
+        <view class="stat-card-mini">
+          <text class="stat-num text-green">{{myCompletedTasks}}</text>
+          <text class="stat-text text-xs text-secondary">已完成</text>
+        </view>
+        <view class="stat-card-mini">
+          <text class="stat-num text-blue">{{totalDeliverables}}</text>
+          <text class="stat-text text-xs text-secondary">交付物</text>
+        </view>
+        <view class="stat-card-mini">
+          <text class="stat-num text-orange">{{rankingList.length}}</text>
+          <text class="stat-text text-xs text-secondary">团队人数</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 贡献趋势图 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">近7天交付趋势</text>
+      </view>
+      <view class="chart-card">
+        <view class="chart-bars">
+          <view wx:for="{{chartData}}" wx:key="day" class="chart-bar-item">
+            <view class="chart-bar-bg">
+              <view class="chart-bar-fill" style="height: {{item.height}}%;"></view>
+            </view>
+            <text class="chart-bar-value text-xs text-orange">{{item.value}}</text>
+            <text class="chart-bar-label text-xs text-secondary">{{item.day}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 团队贡献排行 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">团队贡献排行</text>
+      </view>
+      <view class="ranking-full">
+        <view wx:for="{{rankingList}}" wx:key="_id" class="ranking-full-item">
+          <view class="rank-num-box rank-{{index + 1}}">
+            <text wx:if="{{index < 3}}" class="rank-emoji">{{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}}</text>
+            <text wx:else class="rank-text">{{index + 1}}</text>
+          </view>
+          <view class="rank-user-avatar">{{item.nickName ? item.nickName[0] : '?'}}</view>
+          <view class="rank-user-info flex-1">
+            <view class="flex-between">
+              <text class="rank-user-name">{{item.nickName}}</text>
+              <text class="rank-user-score text-orange font-bold">{{item.contribution || 0}}</text>
+            </view>
+            <view class="rank-progress-bar">
+              <view class="rank-progress-fill" style="width: {{item.percentage}}%;"></view>
+            </view>
+            <view class="flex-between mt-sm">
+              <text class="text-xs text-secondary">已完成 {{item.completedTasks || 0}} 个任务</text>
+              <text class="text-xs text-secondary">占比 {{item.percentage}}%</text>
+            </view>
+          </view>
+        </view>
+        <view wx:if="{{rankingList.length === 0}}" class="team-empty-hint">暂无成员数据</view>
+      </view>
+    </view>
+
+    <!-- 交付物记录 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">交付物记录</text>
+        <text class="text-sm text-secondary">共{{deliverables.length}}个</text>
+      </view>
+      <view class="deliverable-list">
+        <view wx:for="{{deliverables}}" wx:key="_id" class="deliverable-item"
+          bindtap="onPreviewDeliverable" data-item="{{item}}">
+          <view class="del-icon" style="background: {{item.iconColor}};">
+            <text>{{item.iconText}}</text>
+          </view>
+          <view class="del-info flex-1">
+            <text class="del-name">{{item.fileName}}</text>
+            <view class="del-meta">
+              <text class="text-xs text-secondary">{{item.taskTitle}}</text>
+              <text class="text-xs text-secondary">·</text>
+              <text class="text-xs text-secondary">{{item.size}}</text>
+              <text class="text-xs text-secondary">·</text>
+              <text class="text-xs text-secondary">v{{item.version}}</text>
+            </view>
+          </view>
+          <view class="del-right">
+            <text class="text-xs text-secondary">{{item.uploadedAtText}}</text>
+            <text class="del-action text-orange">预览</text>
+          </view>
+        </view>
+        <view wx:if="{{deliverables.length === 0}}" class="team-empty-hint">暂无交付物</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="bottom-space"></view>
+  </block>
+</view>

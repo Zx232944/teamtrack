@@ -1,0 +1,204 @@
+<!--pages/index/index.wxml-->
+<view class="page">
+  <!-- 未登录提示 -->
+  <view wx:if="{{!isLoggedIn}}" class="login-prompt">
+    <view class="login-avatar-placeholder">👤</view>
+    <text class="login-title">登录后查看团队</text>
+    <text class="login-desc text-secondary">请先登录以使用赛队管家</text>
+    <navigator url="/pages/profile/profile" open-type="switchTab" class="btn-primary login-btn">去登录</navigator>
+  </view>
+
+  <block wx:else>
+    <!-- 团队切换条 -->
+    <view class="team-switcher">
+      <view class="team-chip-manage" bindtap="goTeamsPage">
+        <text class="team-chip-manage-icon">≡</text>
+        <text>管理</text>
+      </view>
+      <scroll-view scroll-x class="team-switcher-scroll" enhanced show-scrollbar="{{false}}">
+        <view wx:for="{{teams}}" wx:key="_id"
+          class="team-chip {{item.isActive ? 'active' : ''}}"
+          bindtap="onSwitchTeam" data-id="{{item._id}}">
+          <view class="team-chip-dot"></view>
+          <text>{{item.name}}</text>
+          <text wx:if="{{item.isCaptain}}" class="team-chip-captain">队长</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 无团队提示 -->
+    <view wx:if="{{!hasTeams}}" class="team-empty-hint">
+      还没有团队，点击上方"管理"创建或加入团队开始协作
+    </view>
+
+  <!-- 顶部团队信息 -->
+  <view class="header-section" wx:if="{{hasTeams}}">
+    <view class="team-info">
+      <view class="team-header">
+        <view class="team-badge">T</view>
+        <view class="flex-1">
+          <view class="team-name">{{team.name}}</view>
+          <view class="team-comp text-sm text-secondary">{{team.competition}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进度概览卡片 -->
+    <view class="progress-card">
+      <view class="progress-ring-container">
+        <view class="progress-ring">
+          <view class="progress-ring-bg"></view>
+          <view class="progress-ring-fill" style="background: conic-gradient(#FF6B35 0deg, #FF6B35 {{stats.progress * 3.6}}deg, transparent {{stats.progress * 3.6}}deg);"></view>
+          <view class="progress-ring-inner">
+            <text class="progress-percent">{{stats.progress}}%</text>
+            <text class="progress-label text-xs text-secondary">完成度</text>
+          </view>
+        </view>
+      </view>
+      <view class="progress-stats">
+        <view class="stat-row">
+          <text class="text-secondary text-sm">总任务</text>
+          <text class="font-bold text-lg">{{stats.total}}</text>
+        </view>
+        <view class="stat-row">
+          <text class="text-secondary text-sm">已完成</text>
+          <text class="font-bold text-lg text-green">{{stats.completed}}</text>
+        </view>
+        <view class="stat-row">
+          <text class="text-secondary text-sm">进行中</text>
+          <text class="font-bold text-lg text-blue">{{stats.inProgress}}</text>
+        </view>
+        <view class="stat-row">
+          <text class="text-secondary text-sm">待领取</text>
+          <text class="font-bold text-lg text-yellow">{{stats.pending}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="quick-actions">
+    <view class="action-item" bindtap="goCreateTask">
+      <view class="action-icon" style="background: rgba(255, 107, 53, 0.15);">
+        <text style="color: #FF6B35;">+</text>
+      </view>
+      <text class="action-text">发布任务</text>
+    </view>
+    <view class="action-item" bindtap="goTasks">
+      <view class="action-icon" style="background: rgba(30, 144, 255, 0.15);">
+        <text style="color: #1E90FF;">≡</text>
+      </view>
+      <text class="action-text">任务看板</text>
+    </view>
+    <view class="action-item" bindtap="goContribution">
+      <view class="action-icon" style="background: rgba(0, 212, 170, 0.15);">
+        <text style="color: #00D4AA;">★</text>
+      </view>
+      <text class="action-text">贡献排行</text>
+    </view>
+    <view class="action-item" bindtap="goTeam">
+      <view class="action-icon" style="background: rgba(255, 215, 0, 0.15);">
+        <text style="color: #FFD700;">◔</text>
+      </view>
+      <text class="action-text">团队管理</text>
+    </view>
+  </view>
+
+  <!-- 任务看板预览 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">任务看板</text>
+      <text class="section-more text-secondary text-sm" bindtap="goTasks">查看全部 ></text>
+    </view>
+    <scroll-view scroll-x class="task-board" enhanced show-scrollbar="{{false}}">
+      <view class="task-column">
+        <view class="column-header">
+          <text class="column-title text-yellow">待领取</text>
+          <text class="column-count text-secondary text-xs">{{pendingTasks.length}}</text>
+        </view>
+        <view wx:for="{{pendingTasks}}" wx:key="_id" class="mini-task-card" bindtap="goTaskDetail" data-id="{{item._id}}">
+          <text class="mini-task-title">{{item.title}}</text>
+          <view class="mini-task-meta">
+            <text class="text-xs text-secondary">{{item.category}}</text>
+            <text class="text-xs text-orange">{{item.points}}分</text>
+          </view>
+        </view>
+        <view wx:if="{{pendingTasks.length === 0}}" class="empty-mini">暂无待领取任务</view>
+      </view>
+
+      <view class="task-column">
+        <view class="column-header">
+          <text class="column-title text-blue">进行中</text>
+          <text class="column-count text-secondary text-xs">{{inProgressTasks.length}}</text>
+        </view>
+        <view wx:for="{{inProgressTasks}}" wx:key="_id" class="mini-task-card" bindtap="goTaskDetail" data-id="{{item._id}}">
+          <text class="mini-task-title">{{item.title}}</text>
+          <view class="mini-task-meta">
+            <text class="text-xs text-secondary">{{item.assigneeName}}</text>
+            <text class="text-xs {{item.urgent ? 'text-red' : 'text-secondary'}}">{{item.countdownText}}</text>
+          </view>
+        </view>
+        <view wx:if="{{inProgressTasks.length === 0}}" class="empty-mini">暂无进行中任务</view>
+      </view>
+
+      <view class="task-column">
+        <view class="column-header">
+          <text class="column-title text-green">已完成</text>
+          <text class="column-count text-secondary text-xs">{{completedTasks.length}}</text>
+        </view>
+        <view wx:for="{{completedTasks}}" wx:key="_id" class="mini-task-card" bindtap="goTaskDetail" data-id="{{item._id}}">
+          <text class="mini-task-title">{{item.title}}</text>
+          <view class="mini-task-meta">
+            <text class="text-xs text-secondary">{{item.assigneeName}}</text>
+            <text class="text-xs text-green">✓ 已完成</text>
+          </view>
+        </view>
+        <view wx:if="{{completedTasks.length === 0}}" class="empty-mini">暂无已完成任务</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 贡献排行榜 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">贡献排行榜</text>
+      <text class="section-more text-secondary text-sm" bindtap="goContribution">查看全部 ></text>
+    </view>
+    <view class="ranking-list">
+      <view wx:for="{{rankingList}}" wx:key="_id" class="ranking-item">
+        <view class="rank-badge rank-{{index + 1}}">
+          <text wx:if="{{index < 3}}" class="rank-icon">{{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}}</text>
+          <text wx:else class="rank-num">{{index + 1}}</text>
+        </view>
+        <view class="rank-info flex-1">
+          <text class="rank-name">{{item.nickName}}</text>
+          <view class="rank-bar-container">
+            <view class="rank-bar-fill" style="width: {{item.percentage}}%;"></view>
+          </view>
+        </view>
+        <text class="rank-score text-orange font-bold">{{item.contribution}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最近动态 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">最近动态</text>
+    </view>
+    <view class="activity-list">
+      <view wx:for="{{activities}}" wx:key="_id" class="activity-item">
+        <view class="activity-dot {{item.type}}"></view>
+        <view class="flex-1">
+          <text class="text-sm">{{item.user}}</text>
+          <text class="text-sm text-secondary">{{item.typeText}}</text>
+          <text class="text-sm">{{item.taskTitle}}</text>
+        </view>
+        <text class="text-xs text-secondary">{{item.time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+  </block>
+</view>

@@ -1,0 +1,96 @@
+<!--pages/team/team.wxml-->
+<view class="page">
+  <!-- 团队信息卡片 -->
+  <view class="team-card" wx:if="{{team}}">
+    <view class="team-header-row">
+      <view class="team-badge-lg">{{team.name[0] || 'T'}}</view>
+      <view class="flex-1">
+        <text class="team-name-lg">{{team.name}}</text>
+        <text class="text-sm text-secondary">{{team.competition}}</text>
+      </view>
+      <view class="switch-team-btn" bindtap="goTeamsPage">切换</view>
+    </view>
+    <view class="team-desc text-sm text-secondary">{{team.description}}</view>
+    <view class="team-meta">
+      <view class="team-meta-item">
+        <text class="meta-label text-xs text-secondary">成员数</text>
+        <text class="meta-value text-orange">{{team.memberCount}}</text>
+      </view>
+      <view class="team-meta-item">
+        <text class="meta-label text-xs text-secondary">完成度</text>
+        <text class="meta-value text-green">{{team.progress}}%</text>
+      </view>
+      <view class="team-meta-item">
+        <text class="meta-label text-xs text-secondary">截止日期</text>
+        <text class="meta-value text-blue">{{team.deadline}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 无团队提示 -->
+  <view wx:if="{{!loading && !team}}" class="empty-team">
+    <text class="text-secondary">还没有团队，去创建或加入一个吧</text>
+    <view class="empty-team-btns">
+      <navigator url="/pages/createTeam/createTeam" class="empty-btn primary">创建团队</navigator>
+      <navigator url="/pages/teams/teams" class="empty-btn">团队管理</navigator>
+    </view>
+  </view>
+
+  <!-- 时间线 -->
+  <view class="section" wx:if="{{team}}">
+    <view class="section-title">竞赛时间线</view>
+    <view class="timeline">
+      <view wx:for="{{timeline}}" wx:key="step" class="timeline-item {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}">
+        <view class="timeline-dot"></view>
+        <view class="timeline-content">
+          <text class="timeline-step text-sm text-secondary">步骤 {{item.step}}</text>
+          <text class="timeline-title">{{item.title}}</text>
+          <text class="timeline-date text-xs text-secondary">{{item.date}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成员列表 -->
+  <view class="section" wx:if="{{team}}">
+    <view class="section-header">
+      <text class="section-title">团队成员</text>
+      <button class="invite-btn" open-type="share">邀请成员</button>
+    </view>
+    <view class="member-list">
+      <view wx:for="{{members}}" wx:key="_id" class="member-item">
+        <view class="member-avatar">{{item.nickName[0]}}</view>
+        <view class="flex-1">
+          <view class="flex gap-sm align-center">
+            <text class="member-name">{{item.nickName}}</text>
+            <view class="tag {{item.role === 'captain' ? 'tag-orange' : 'tag-blue'}}">{{item.role === 'captain' ? '队长' : '队员'}}</view>
+          </view>
+          <text class="text-xs text-secondary">贡献值 {{item.contribution}} · 完成 {{item.completedTasks}} 个任务</text>
+        </view>
+        <view class="member-progress">
+          <view class="member-progress-bar">
+            <view class="member-progress-fill" style="width: {{item.percentage}}%;"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 邀请码 -->
+  <view class="section" wx:if="{{team}}">
+    <view class="invite-card">
+      <view class="invite-info">
+        <text class="invite-title">团队邀请码</text>
+        <text class="invite-code">{{inviteCode}}</text>
+      </view>
+      <view class="invite-action" bindtap="copyCode">
+        <text>复制</text>
+      </view>
+    </view>
+    <view class="join-team-btn" bindtap="onJoinTeam">
+      <text>通过邀请码加入其他团队</text>
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

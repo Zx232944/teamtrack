@@ -1,0 +1,81 @@
+<!--pages/myStats/myStats.wxml-->
+<view class="page">
+  <!-- 汇总卡片 -->
+  <view class="summary-card">
+    <view class="summary-title">累计数据总览</view>
+    <view class="summary-stats">
+      <view class="ss-item">
+        <text class="ss-num text-orange">{{total.contribution}}</text>
+        <text class="ss-label text-xs text-secondary">累计贡献</text>
+      </view>
+      <view class="ss-divider"></view>
+      <view class="ss-item">
+        <text class="ss-num text-green">{{total.completed}}</text>
+        <text class="ss-label text-xs text-secondary">已完成任务</text>
+      </view>
+      <view class="ss-divider"></view>
+      <view class="ss-item">
+        <text class="ss-num text-blue">{{total.ongoing}}</text>
+        <text class="ss-label text-xs text-secondary">进行中任务</text>
+      </view>
+    </view>
+    <view class="summary-meta text-xs text-secondary">
+      共 {{teams.length}} 个团队
+    </view>
+  </view>
+
+  <!-- 按团队拆分 -->
+  <view class="section-title">按团队分布</view>
+
+  <block wx:if="{{!loading && teams.length > 0}}">
+    <view class="team-stat-card" wx:for="{{teams}}" wx:key="_id">
+      <view class="tsc-header" bindtap="goTeamDetail" data-id="{{item._id}}">
+        <view class="tsc-badge">{{item.name[0] || 'T'}}</view>
+        <view class="tsc-info">
+          <view class="tsc-name-row">
+            <text class="tsc-name">{{item.name}}</text>
+            <view class="tag {{item.myRole === 'captain' ? 'tag-orange' : 'tag-blue'}}">
+              {{item.myRole === 'captain' ? '队长' : '队员'}}
+            </view>
+          </view>
+          <text class="tsc-competition text-xs text-secondary">{{item.competition}}</text>
+        </view>
+      </view>
+
+      <view class="tsc-stats">
+        <view class="tsc-stat">
+          <text class="tsc-stat-num text-orange">{{item.myContribution || 0}}</text>
+          <text class="tsc-stat-label text-xs text-secondary">贡献</text>
+        </view>
+        <view class="tsc-stat">
+          <text class="tsc-stat-num text-green">{{item.myCompletedTasks || 0}}</text>
+          <text class="tsc-stat-label text-xs text-secondary">已完成</text>
+        </view>
+        <view class="tsc-stat">
+          <text class="tsc-stat-num text-blue">{{item.myOngoingTasks || 0}}</text>
+          <text class="tsc-stat-label text-xs text-secondary">进行中</text>
+        </view>
+      </view>
+
+      <view class="tsc-footer">
+        <view class="tsc-link" catchtap="goContribution" data-id="{{item._id}}">查看团队贡献榜 ›</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <block wx:elif="{{!loading && teams.length === 0}}">
+    <view class="empty-state">
+      <view class="empty-icon">📊</view>
+      <text class="empty-title">暂无团队数据</text>
+      <text class="empty-desc text-secondary">加入团队后可查看累计贡献明细</text>
+    </view>
+  </block>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <text class="text-secondary">加载中...</text>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

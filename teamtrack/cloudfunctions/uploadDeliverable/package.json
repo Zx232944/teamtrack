@@ -1,0 +1,9 @@
+{
+  "name": "uploadDeliverable",
+  "version": "1.0.0",
+  "description": "记录交付物信息云函数",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

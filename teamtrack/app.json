@@ -1,0 +1,53 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/tasks/tasks",
+    "pages/contribution/contribution",
+    "pages/team/team",
+    "pages/teams/teams",
+    "pages/profile/profile",
+    "pages/createTask/createTask",
+    "pages/createTeam/createTeam",
+    "pages/taskDetail/taskDetail",
+    "pages/myStats/myStats"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#0F0F1A",
+    "navigationBarTitleText": "赛队管家",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0F0F1A"
+  },
+  "tabBar": {
+    "color": "#A0A0B0",
+    "selectedColor": "#FF6B35",
+    "backgroundColor": "#1A1A2E",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/tasks/tasks",
+        "text": "任务"
+      },
+      {
+        "pagePath": "pages/contribution/contribution",
+        "text": "贡献"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "cloud": true,
+  "permission": {
+    "scope.userInfo": {
+      "desc": "用于在团队中展示你的昵称和头像"
+    }
+  }
+}
