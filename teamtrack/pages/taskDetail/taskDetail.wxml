@@ -1,0 +1,86 @@
+<!--pages/taskDetail/taskDetail.wxml-->
+<view class="page" wx:if="{{task}}">
+  <!-- 任务头部 -->
+  <view class="detail-header">
+    <view class="detail-tags">
+      <view class="tag tag-blue">{{task.category}}</view>
+      <view class="tag {{task.statusClass}}">{{task.statusText}}</view>
+    </view>
+    <view class="detail-title">{{task.title}}</view>
+    <view class="detail-meta">
+      <text class="text-sm text-secondary">发布于 {{task.createdAt}}</text>
+      <text class="text-sm text-orange font-bold ml-md">{{task.points}}分</text>
+    </view>
+  </view>
+
+  <!-- 任务描述 -->
+  <view class="detail-section">
+    <view class="detail-section-title">任务描述</view>
+    <view class="detail-content">{{task.description}}</view>
+  </view>
+
+  <!-- 截止时间 -->
+  <view class="detail-section">
+    <view class="detail-section-title">截止时间</view>
+    <view class="deadline-card {{countdown.urgent ? 'urgent' : ''}}">
+      <view class="deadline-info">
+        <text class="deadline-date">{{task.deadline}}</text>
+        <text class="deadline-countdown {{countdown.urgent ? 'text-red' : 'text-orange'}}">{{countdown.text}}</text>
+      </view>
+      <view class="deadline-icon">⏰</view>
+    </view>
+  </view>
+
+  <!-- 负责人 -->
+  <view class="detail-section">
+    <view class="detail-section-title">负责人</view>
+    <view class="assignee-card" wx:if="{{task.assigneeName}}">
+      <view class="assignee-avatar-lg">{{task.assigneeName[0]}}</view>
+      <view class="flex-1">
+        <text class="assignee-name">{{task.assigneeName}}</text>
+        <text class="text-xs text-secondary">{{task.status === 'in_progress' ? '正在执行中' : '已完成'}}</text>
+      </view>
+    </view>
+    <view wx:else class="no-assignee">
+      <text class="text-secondary">暂无负责人，快来抢单吧！</text>
+      <view class="claim-btn" bindtap="onClaim">立即抢单</view>
+    </view>
+  </view>
+
+  <!-- 交付物 -->
+  <view class="detail-section">
+    <view class="detail-section-title">交付物 ({{deliverables.length}})</view>
+    <view wx:if="{{deliverables.length > 0}}" class="deliverable-list">
+      <view wx:for="{{deliverables}}" wx:key="_id" class="deliverable-item" bindtap="onPreviewDeliverable" data-item="{{item}}">
+        <view class="del-icon" style="background: {{item.iconColor}};">
+          <text>{{item.iconText}}</text>
+        </view>
+        <view class="del-info flex-1">
+          <text class="del-name">{{item.fileName}}</text>
+          <text class="text-xs text-secondary">{{item.userName}} · v{{item.version}} · {{item.size}}</text>
+        </view>
+        <text class="text-xs text-secondary">{{item.uploadedAt}}</text>
+      </view>
+    </view>
+    <view wx:else class="empty-mini">暂无交付物</view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="detail-actions">
+    <block wx:if="{{task.status === 'pending'}}">
+      <button class="btn-primary" bindtap="onClaim">立即抢单</button>
+    </block>
+    <block wx:if="{{task.status === 'in_progress'}}">
+      <button class="btn-secondary" bindtap="onUpload" loading="{{uploading}}">上传交付物</button>
+      <button class="btn-primary" bindtap="onComplete">标记完成</button>
+    </block>
+    <block wx:if="{{task.status === 'completed'}}">
+      <view class="completed-badge">✓ 任务已完成</view>
+    </block>
+  </view>
+</view>
+
+<!-- 加载中 -->
+<view wx:if="{{!task}}" class="loading">
+  <text class="text-secondary">加载中...</text>
+</view>

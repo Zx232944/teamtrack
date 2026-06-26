@@ -1,0 +1,287 @@
+/* 全局样式 */
+page {
+  background-color: #0F0F1A;
+  color: #FFFFFF;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+view, text, scroll-view {
+  box-sizing: border-box;
+}
+
+/* 颜色变量通过class定义 */
+.bg-primary { background-color: #0F0F1A; }
+.bg-card { background-color: #1A1A2E; }
+.bg-card-hover { background-color: #252540; }
+
+.text-primary { color: #FFFFFF; }
+.text-secondary { color: #A0A0B0; }
+.text-orange { color: #FF6B35; }
+.text-blue { color: #1E90FF; }
+.text-green { color: #00D4AA; }
+.text-yellow { color: #FFD700; }
+.text-red { color: #FF4757; }
+
+/* 通用容器 */
+.container {
+  padding: 24rpx;
+}
+
+/* 卡片样式 */
+.card {
+  background: #1A1A2E;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.card-hover {
+  background: #252540;
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: linear-gradient(135deg, #FF6B35, #FF8C5A);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 16rpx;
+  padding: 24rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 4rpx 20rpx rgba(255, 107, 53, 0.3);
+}
+
+.btn-primary::after {
+  border: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #FFFFFF;
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  border-radius: 16rpx;
+  padding: 24rpx 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+}
+
+.btn-secondary::after {
+  border: none;
+}
+
+/* 渐变文字 */
+.gradient-text {
+  background: linear-gradient(135deg, #FF6B35, #1E90FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 标签样式 */
+.tag {
+  display: inline-block;
+  padding: 4rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+}
+
+.tag-orange { background: rgba(255, 107, 53, 0.2); color: #FF6B35; }
+.tag-blue { background: rgba(30, 144, 255, 0.2); color: #1E90FF; }
+.tag-green { background: rgba(0, 212, 170, 0.2); color: #00D4AA; }
+.tag-yellow { background: rgba(255, 215, 0, 0.2); color: #FFD700; }
+.tag-red { background: rgba(255, 71, 87, 0.2); color: #FF4757; }
+
+/* 分割线 */
+.divider {
+  height: 1rpx;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 24rpx 0;
+}
+
+/* 弹性布局 */
+.flex { display: flex; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-1 { flex: 1; }
+.gap-sm { gap: 12rpx; }
+.gap-md { gap: 24rpx; }
+.gap-lg { gap: 32rpx; }
+
+/* 文字大小 */
+.text-xs { font-size: 22rpx; }
+.text-sm { font-size: 26rpx; }
+.text-md { font-size: 30rpx; }
+.text-lg { font-size: 36rpx; }
+.text-xl { font-size: 44rpx; }
+.text-xxl { font-size: 56rpx; }
+
+.font-bold { font-weight: 700; }
+.font-medium { font-weight: 500; }
+
+/* 间距 */
+.mt-sm { margin-top: 12rpx; }
+.mt-md { margin-top: 24rpx; }
+.mt-lg { margin-top: 32rpx; }
+.mb-sm { margin-bottom: 12rpx; }
+.mb-md { margin-bottom: 24rpx; }
+.mb-lg { margin-bottom: 32rpx; }
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 0;
+}
+
+.empty-state .empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-state .empty-text {
+  color: #A0A0B0;
+  font-size: 28rpx;
+}
+
+/* ===== 团队切换条（多团队管理） ===== */
+.team-switcher {
+  background: #1A1A2E;
+  padding: 16rpx 24rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.team-switcher-scroll {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  display: flex;
+  gap: 16rpx;
+}
+
+.team-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 24rpx;
+  background: #252540;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #A0A0B0;
+  border: 1rpx solid transparent;
+  transition: all 0.2s;
+}
+
+.team-chip.active {
+  background: rgba(255, 107, 53, 0.15);
+  color: #FF6B35;
+  border-color: rgba(255, 107, 53, 0.4);
+}
+
+.team-chip-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #A0A0B0;
+}
+
+.team-chip.active .team-chip-dot {
+  background: #FF6B35;
+}
+
+.team-chip-captain {
+  font-size: 20rpx;
+  padding: 2rpx 8rpx;
+  background: rgba(255, 215, 0, 0.2);
+  color: #FFD700;
+  border-radius: 8rpx;
+}
+
+.team-chip-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12rpx 20rpx;
+  background: transparent;
+  border: 1rpx dashed rgba(255, 255, 255, 0.2);
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #A0A0B0;
+}
+
+/* 团队管理入口（统一在管理页内创建/加入） */
+.team-chip-manage {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 12rpx 24rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #A0A0B0;
+}
+
+.team-chip-manage:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.team-chip-manage-icon {
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.team-empty-hint {
+  padding: 24rpx;
+  text-align: center;
+  color: #A0A0B0;
+  font-size: 26rpx;
+}
+
+/* ===== 未登录提示（跨页面复用） ===== */
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 200rpx;
+}
+
+.login-avatar-placeholder {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  background: #1A1A2E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.login-title {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 12rpx;
+}
+
+.login-desc {
+  font-size: 28rpx;
+  margin-bottom: 48rpx;
+}
+
+.login-btn {
+  width: 60%;
+}

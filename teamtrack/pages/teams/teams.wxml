@@ -1,0 +1,110 @@
+<!--pages/teams/teams.wxml-->
+<view class="page">
+  <!-- 顶部操作栏 -->
+  <view class="top-actions">
+    <view class="top-btn top-btn-primary" bindtap="goCreateTeam">
+      <text class="top-btn-icon">+</text>
+      <text>创建团队</text>
+    </view>
+    <view class="top-btn top-btn-secondary" bindtap="onJoinByCode">
+      <text class="top-btn-icon">⚑</text>
+      <text>邀请码加入</text>
+    </view>
+  </view>
+
+  <!-- 团队列表 -->
+  <block wx:if="{{!loading && teams.length > 0}}">
+    <view class="team-list">
+      <view wx:for="{{teams}}" wx:key="_id" class="team-card {{item.isCurrent ? 'current' : ''}}">
+        <!-- 卡片头部 -->
+        <view class="team-card-header" bindtap="goTeamDetail" data-id="{{item._id}}">
+          <view class="team-badge">{{item.name[0] || 'T'}}</view>
+          <view class="team-info">
+            <view class="team-name-row">
+              <text class="team-name">{{item.name}}</text>
+              <view class="tag {{item.myRole === 'captain' ? 'tag-orange' : 'tag-blue'}}">
+                {{item.myRole === 'captain' ? '队长' : '队员'}}
+              </view>
+              <view wx:if="{{item.isCurrent}}" class="tag tag-green">当前</view>
+            </view>
+            <text class="team-competition text-sm text-secondary">{{item.competition}}</text>
+          </view>
+        </view>
+
+        <!-- 描述 -->
+        <view class="team-card-desc text-sm text-secondary" wx:if="{{item.description}}">
+          {{item.description}}
+        </view>
+
+        <!-- 统计 -->
+        <view class="team-card-meta">
+          <view class="meta-item">
+            <text class="meta-num text-orange">{{item.memberCount || 1}}</text>
+            <text class="meta-label text-xs text-secondary">成员</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-num text-green">{{item.progress || 0}}%</text>
+            <text class="meta-label text-xs text-secondary">进度</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-num text-blue">{{item.myContribution || 0}}</text>
+            <text class="meta-label text-xs text-secondary">我的贡献</text>
+          </view>
+          <view class="meta-item">
+            <text class="meta-num text-secondary">{{item.myCompletedTasks || 0}}</text>
+            <text class="meta-label text-xs text-secondary">完成数</text>
+          </view>
+        </view>
+
+        <!-- 邀请码 -->
+        <view wx:if="{{item.inviteCode}}" class="invite-code-box">
+          <view class="invite-code-left">
+            <text class="text-xs text-secondary">邀请码</text>
+            <text class="invite-code-text">{{item.inviteCode}}</text>
+          </view>
+          <view class="invite-code-actions">
+            <view class="icon-btn" catchtap="onCopyInviteCode" data-code="{{item.inviteCode}}">
+              <text>复制</text>
+            </view>
+            <button class="icon-btn icon-btn-primary" open-type="share" data-team="{{item}}" data-id="{{item._id}}" data-name="{{item.name}}" data-code="{{item.inviteCode}}">
+              <text>微信邀请</text>
+            </button>
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="team-card-footer">
+          <view wx:if="{{!item.isCurrent}}" class="footer-btn footer-btn-primary" catchtap="onSwitchTeam" data-id="{{item._id}}">
+            切换到此团队
+          </view>
+          <view wx:else class="footer-btn footer-btn-disabled">
+            当前团队
+          </view>
+          <view wx:if="{{item.myRole === 'captain'}}" class="footer-btn footer-btn-danger" catchtap="onDissolveTeam" data-id="{{item._id}}" data-name="{{item.name}}">
+            解散团队
+          </view>
+          <view wx:else class="footer-btn footer-btn-warn" catchtap="onQuitTeam" data-id="{{item._id}}" data-name="{{item.name}}">
+            退出团队
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 空状态 -->
+  <block wx:elif="{{!loading && teams.length === 0}}">
+    <view class="empty-state">
+      <view class="empty-icon">👥</view>
+      <text class="empty-title">还没有加入任何团队</text>
+      <text class="empty-desc text-secondary">创建你的第一个团队，或通过邀请码加入</text>
+      <button class="btn-primary" bindtap="goCreateTeam">立即创建团队</button>
+    </view>
+  </block>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading-state">
+    <text class="text-secondary">加载中...</text>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>

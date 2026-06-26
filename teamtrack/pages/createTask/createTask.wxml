@@ -1,0 +1,62 @@
+<!--pages/createTask/createTask.wxml-->
+<view class="page">
+  <view class="form-section">
+    <!-- 团队选择 -->
+    <view class="form-item">
+      <text class="form-label">发布到团队</text>
+      <picker bindchange="onTeamChange" value="{{teamIndex}}" range="{{teams}}" range-key="name">
+        <view class="form-picker">
+          <text wx:if="{{teams.length > 0}}">{{teams[teamIndex].name}}</text>
+          <text wx:else class="placeholder">请先创建团队</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+      <text wx:if="{{teams.length > 0}}" class="form-hint text-xs text-secondary">
+        {{teams[teamIndex].competition}}
+      </text>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">任务标题</text>
+      <input class="form-input" placeholder="请输入任务标题" value="{{form.title}}" bindinput="onInput" data-field="title" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">任务描述</text>
+      <textarea class="form-textarea" placeholder="详细描述任务要求和交付标准" value="{{form.description}}" bindinput="onInput" data-field="description" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">任务分类</text>
+      <view class="category-list">
+        <view wx:for="{{categories}}" wx:key="*this" class="category-item {{form.category === item ? 'active' : ''}}" bindtap="onSelectCategory" data-category="{{item}}">
+          {{item}}
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">截止时间</text>
+      <picker mode="date" value="{{form.deadline}}" start="{{today}}" bindchange="onDateChange">
+        <view class="form-picker {{form.deadline ? '' : 'placeholder'}}">
+          {{form.deadline || '请选择截止日期'}}
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">任务分值</text>
+      <view class="points-selector">
+        <view wx:for="{{pointsOptions}}" wx:key="*this" class="points-item {{form.points === item ? 'active' : ''}}" bindtap="onSelectPoints" data-points="{{item}}">
+          {{item}}分
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="form-actions">
+    <button class="btn-secondary" bindtap="onCancel">取消</button>
+    <button class="btn-primary" bindtap="onSubmit" loading="{{submitting}}">发布任务</button>
+  </view>
+</view>
