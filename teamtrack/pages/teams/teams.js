@@ -10,18 +10,21 @@ Page({
 
   onLoad() {
     this._loaded = false
+    this._force = false
     this.loadTeams()
   },
 
   onShow() {
     // 避免与 onLoad 重复请求，仅在实际需要刷新时加载
     if (this._loaded) {
+      this._force = false
       this.loadTeams()
     }
   },
 
   // 下拉刷新
   async onPullDownRefresh() {
+    this._force = true
     await this.loadTeams()
     wx.stopPullDownRefresh()
   },
@@ -30,7 +33,7 @@ Page({
     this.setData({ loading: true })
     this._loaded = true
     try {
-      const teams = await DB.getMyTeams()
+      const teams = await DB.getMyTeamsWithCache(this._force)
       const currentTeamId = DB.getCurrentTeamId()
 
       // 如果没设置当前团队但有团队数据，默认选第一个

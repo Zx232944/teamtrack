@@ -64,7 +64,6 @@ Page({
   },
 
   async onClaim() {
-    const user = await DB.getCurrentUser()
     wx.showModal({
       title: '确认抢单',
       content: '领取后需按时完成并提交交付物，确定领取该任务吗？',
@@ -158,7 +157,6 @@ Page({
     wx.showLoading({ title: '上传中...', mask: true })
 
     try {
-      const user = await DB.getCurrentUser()
       const task = this.data.task
 
       // 格式化文件大小
@@ -173,8 +171,7 @@ Page({
         taskId: task._id,
         taskTitle: task.title,
         fileName,
-        filePath,
-        user
+        filePath
       })
 
       wx.hideLoading()
@@ -193,7 +190,6 @@ Page({
   async doUploadLink(fileName, link) {
     wx.showLoading({ title: '提交中...' })
     try {
-      const user = await DB.getCurrentUser()
       const task = this.data.task
 
       // 直接调用云函数记录（链接类型，不走云存储）
@@ -202,7 +198,6 @@ Page({
         taskTitle: task.title,
         fileName: fileName,
         filePath: null,
-        user,
         isLink: true,
         linkUrl: link
       })
@@ -318,6 +313,7 @@ Page({
           wx.showLoading({ title: '处理中...' })
           try {
             await DB.updateTaskStatus(this.taskId, 'completed')
+            auth.invalidateUser()
             wx.hideLoading()
             wx.showToast({ title: '任务已完成！', icon: 'success' })
             this.loadDetail()

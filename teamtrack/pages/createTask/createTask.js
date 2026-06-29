@@ -28,7 +28,7 @@ Page({
 
   async loadTeams() {
     try {
-      const teams = await DB.getMyTeams()
+      const teams = await DB.getMyTeamsWithCache()
       if (teams.length === 0) {
         wx.showModal({
           title: '提示',

@@ -4,6 +4,7 @@
  */
 
 const cloud = require('./cloud')
+const appStore = require('./appStore')
 
 // ============ 当前团队管理 ============
 
@@ -63,6 +64,20 @@ async function getMyTeams() {
 }
 
 /**
+ * 缓存优先拉取团队列表
+ * @param {boolean} force true 跳过缓存直接拉取
+ */
+async function getMyTeamsWithCache(force = false) {
+  if (!force) {
+    const cached = appStore.getTeams()
+    if (cached !== null) return cached
+  }
+  const teams = await getMyTeams()
+  appStore.setTeams(teams)
+  return teams
+}
+
+/**
  * 获取当前团队信息（或指定团队）
  */
 async function getTeam(teamId) {
@@ -100,6 +115,7 @@ async function createTeam(data) {
   if (res && res.teamId) {
     setCurrentTeamId(res.teamId)
   }
+  appStore.invalidateTeams()
   return res
 }
 
@@ -112,6 +128,7 @@ async function joinTeam(inviteCode) {
   if (res && res.teamId) {
     setCurrentTeamId(res.teamId)
   }
+  appStore.invalidateTeams()
   return res
 }
 
@@ -120,7 +137,9 @@ async function joinTeam(inviteCode) {
  * @param {string} teamId
  */
 async function quitTeam(teamId) {
-  return await cloud.callFunction('quitTeam', { teamId })
+  const res = await cloud.callFunction('quitTeam', { teamId })
+  appStore.invalidateTeams()
+  return res
 }
 
 // ============ 任务相关 ============
@@ -163,12 +182,16 @@ async function createTask(data) {
 }
 
 async function claimTask(taskId) {
-  return await cloud.callFunction('claimTask', { taskId })
+  const res = await cloud.callFunction('claimTask', { taskId })
+  appStore.invalidateTeams()
+  return res
 }
 
 async function updateTaskStatus(taskId, status) {
   if (status === 'completed') {
-    return await cloud.callFunction('completeTask', { taskId })
+    const res = await cloud.callFunction('completeTask', { taskId })
+    appStore.invalidateTeams()
+    return res
   }
   return await cloud.updateRecord('tasks', taskId, { status })
 }
@@ -251,6 +274,20 @@ async function getActivities(limit = 20, teamId) {
 
 // ============ 统计相关 ============
 
+/**
+ * 纯函数：从已有 tasks/members 计算统计（零 IO，供 index 等页面复用避免重复查询）
+ */
+function computeStats(tasks, members) {
+  return {
+    totalTasks: tasks.length,
+    completedTasks: tasks.filter(t => t.status === 'completed').length,
+    inProgressTasks: tasks.filter(t => t.status === 'in_progress').length,
+    pendingTasks: tasks.filter(t => t.status === 'pending').length,
+    memberCount: members.length,
+    totalContribution: members.reduce((sum, m) => sum + (m.contribution || 0), 0)
+  }
+}
+
 async function getStats(teamId) {
   const tid = teamId || getCurrentTeamId()
   try {
@@ -258,14 +295,7 @@ async function getStats(teamId) {
       getTasks({ status: 'all' }, tid),
       getMembers(tid)
     ])
-    return {
-      totalTasks: tasks.length,
-      completedTasks: tasks.filter(t => t.status === 'completed').length,
-      inProgressTasks: tasks.filter(t => t.status === 'in_progress').length,
-      pendingTasks: tasks.filter(t => t.status === 'pending').length,
-      memberCount: members.length,
-      totalContribution: members.reduce((sum, m) => sum + (m.contribution || 0), 0)
-    }
+    return computeStats(tasks, members)
   } catch (e) {
     console.warn('[db] 获取统计失败', e)
     return {
@@ -285,6 +315,8 @@ module.exports = {
   getCurrentUser,
   updateUserInfo,
   getMyTeams,
+  getMyTeamsWithCache,
+  computeStats,
   getTeam,
   getMembers,
   createTeam,

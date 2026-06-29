@@ -175,6 +175,7 @@ Page({
           wx.showLoading({ title: '领取中...' })
           try {
             await DB.claimTask(id)
+            auth.invalidateUser()
             wx.hideLoading()
             wx.showToast({ title: '抢单成功！', icon: 'success' })
             this.loadTasks()

@@ -1,22 +1,33 @@
 /**
- * 全局共享数据缓存
- * 避免每个页面都重复调用云函数，由先加载数据的页面写入缓存，
- * 其他页面（如 profile / myStats）直接读取，减少云函数调用。
+ * 全局共享数据缓存 - 团队列表
+ * user 缓存归 auth.js 管理，本模块只管 teams。
+ * 缓存只存 getMyTeams 云函数返回的原始格式，不含 isActive/isCaptain 等派生字段。
  *
- * 数据来源：
- * - teams：由首页/任务页/贡献页的 teamSwitcher.load() 写入
- * - user：由 profile 的 loadUser() 写入
+ * 数据来源：db.getMyTeamsWithCache 内部写入
+ * 失效时机：写操作（createTeam/joinTeam/quitTeam/claimTask/completeTask）后由 db.js 调 invalidateTeams
  */
 
-const TEAM_CACHE_KEY = 'cache_teams'
-const USER_CACHE_KEY = 'userInfo'
+const TEAM_CACHE_KEY = 'cache_teams_v2'
 
-// 内存缓存（进程级）
+// 内存缓存（进程级，跨页面共享，冷启动丢失）
 let _teams = null
-let _user = null
 
 /**
- * 写入团队列表缓存（含 myContribution / myCompletedTasks / myOngoingTasks）
+ * 同步读取团队列表缓存（内存优先 → storage 回填）
+ * @returns {Array|null} teams，null 表示无缓存
+ */
+function getTeams() {
+  if (_teams) return _teams
+  try {
+    _teams = wx.getStorageSync(TEAM_CACHE_KEY) || null
+    return _teams
+  } catch (e) {
+    return null
+  }
+}
+
+/**
+ * 写入团队列表缓存（仅原始格式，拒绝派生字段）
  */
 function setTeams(teams) {
   _teams = teams || []
@@ -26,59 +37,25 @@ function setTeams(teams) {
 }
 
 /**
- * 读取团队列表缓存
+ * 失效团队列表缓存（写操作后调用）
  */
-function getTeams() {
-  if (_teams) return _teams
+function invalidateTeams() {
+  _teams = null
   try {
-    _teams = wx.getStorageSync(TEAM_CACHE_KEY) || []
-    return _teams
-  } catch (e) {
-    return []
-  }
-}
-
-/**
- * 写入用户信息缓存
- */
-function setUser(user) {
-  _user = user || null
-  if (user) {
-    try {
-      wx.setStorageSync(USER_CACHE_KEY, user)
-    } catch (e) {}
-  }
-}
-
-/**
- * 读取用户信息缓存
- */
-function getUser() {
-  if (_user) return _user
-  try {
-    _user = wx.getStorageSync(USER_CACHE_KEY) || null
-    return _user
-  } catch (e) {
-    return null
-  }
+    wx.removeStorageSync(TEAM_CACHE_KEY)
+  } catch (e) {}
 }
 
 /**
  * 清空所有缓存（退出登录时调用）
  */
 function clear() {
-  _teams = null
-  _user = null
-  try {
-    wx.removeStorageSync(TEAM_CACHE_KEY)
-    wx.removeStorageSync(USER_CACHE_KEY)
-  } catch (e) {}
+  invalidateTeams()
 }
 
 module.exports = {
-  setTeams,
   getTeams,
-  setUser,
-  getUser,
+  setTeams,
+  invalidateTeams,
   clear
 }

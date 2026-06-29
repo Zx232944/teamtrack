@@ -1,7 +1,6 @@
 // pages/profile/profile.js
 const DB = require('../../utils/db')
 const auth = require('../../utils/auth')
-const appStore = require('../../utils/appStore')
 
 Page({
   data: {
@@ -35,9 +34,7 @@ Page({
     const cached = auth.getCachedUser()
     if (cached) {
       this.setData({ user: cached, isLoggedIn: true })
-      appStore.setUser(cached)
-      // 拉取最新用户信息（含 contribution 等统计字段，由 users 表维护）
-      this.loadUser()
+      this.loadUser()  // 拉取最新用户信息（含 contribution 等统计字段，由 users 表维护）
     } else {
       // 未登录（或已退出），不自动调用 login 云函数
       this.setData({ user: {}, isLoggedIn: false })
@@ -48,10 +45,8 @@ Page({
   async loadUser() {
     if (!auth.isLoggedIn()) return
     try {
-      const user = await DB.getCurrentUser()
+      const user = await auth.refreshUser()
       if (user) {
-        auth.setCachedUser(user)
-        appStore.setUser(user)
         this.setData({ user, isLoggedIn: true })
       }
     } catch (err) {
@@ -79,7 +74,6 @@ Page({
 
       // 老用户：直接登录
       const user = result.user
-      appStore.setUser(user)
       this.setData({ user, isLoggedIn: true })
       wx.showToast({ title: '登录成功', icon: 'success' })
     } catch (err) {
@@ -140,7 +134,6 @@ Page({
 
     try {
       const user = await auth.register({ phoneCode: tempPhoneCode, nickName })
-      appStore.setUser(user)
       this.setData({
         user,
         isLoggedIn: true,

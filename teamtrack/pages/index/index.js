@@ -142,9 +142,8 @@ Page({
     wx.showLoading({ title: '加载中...' })
 
     try {
-      const [team, stats, tasks, members, activities] = await Promise.all([
+      const [team, tasks, members, activities] = await Promise.all([
         DB.getTeam(),
-        DB.getStats(),
         DB.getTasks(),
         DB.getMembers(),
         DB.getActivities()
@@ -156,7 +155,8 @@ Page({
         return
       }
 
-      // 计算进度
+      // 纯函数计算统计，避免 getStats 内部重复查询 tasks/members
+      const stats = DB.computeStats(tasks, members)
       stats.progress = stats.totalTasks > 0
         ? Math.round((stats.completedTasks / stats.totalTasks) * 100)
         : 0

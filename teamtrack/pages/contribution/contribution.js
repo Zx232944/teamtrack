@@ -94,7 +94,7 @@ Page({
   async loadData() {
     try {
       const [user, members, tasks, allDeliverables] = await Promise.all([
-        DB.getCurrentUser(),
+        auth.getCachedUser(),
         DB.getMembers(),
         DB.getTasks({ status: 'all' }),
         DB.getDeliverables()

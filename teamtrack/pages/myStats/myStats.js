@@ -1,6 +1,5 @@
 // pages/myStats/myStats.js - 累计数据详情（按团队拆分）
 // total 取 users 表全局累计字段；按团队分布直接调用 getMyTeams 实时统计
-const appStore = require('../../utils/appStore')
 const auth = require('../../utils/auth')
 const DB = require('../../utils/db')
 
@@ -36,16 +35,13 @@ Page({
     }
     this.setData({ loading: true })
     try {
-      // user.contribution 等来自 users 表（由 claimTask/completeTask 维护）
-      const user = await DB.getCurrentUser()
-      // 直接调用 getMyTeams 拿按团队拆分（不走缓存，确保数据最新）
-      const teams = await DB.getMyTeams()
-      appStore.setTeams(teams)
-      console.log('[myStats] user=', user, 'teams=', teams)
+      // 优先用缓存立即渲染，后台刷新最新统计
+      const cachedUser = auth.getCachedUser()
+      const teams = await DB.getMyTeamsWithCache()
       const total = {
-        contribution: (user && user.contribution) || 0,
-        completed: (user && user.completedTasks) || 0,
-        ongoing: (user && user.ongoingTasks) || 0
+        contribution: (cachedUser && cachedUser.contribution) || 0,
+        completed: (cachedUser && cachedUser.completedTasks) || 0,
+        ongoing: (cachedUser && cachedUser.ongoingTasks) || 0
       }
       this.setData({
         teams: teams || [],
@@ -53,6 +49,17 @@ Page({
         loading: false,
         isLoggedIn: true
       })
+      // 后台刷新用户统计（claimTask/completeTask 后 users 表字段会变）
+      const user = await auth.refreshUser()
+      if (user) {
+        this.setData({
+          total: {
+            contribution: user.contribution || 0,
+            completed: user.completedTasks || 0,
+            ongoing: user.ongoingTasks || 0
+          }
+        })
+      }
     } catch (err) {
       console.error('[myStats] 加载失败', err)
       this.setData({ loading: false, teams: [] })

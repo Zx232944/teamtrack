@@ -13,7 +13,7 @@ const teamSwitcher = {
    */
   async load(page) {
     try {
-      const teams = await DB.getMyTeams()
+      const teams = await DB.getMyTeamsWithCache()
       const currentTeamId = DB.getCurrentTeamId()
 
       let finalCurrent = currentTeamId
@@ -28,9 +28,6 @@ const teamSwitcher = {
         isCaptain: t.myRole === 'captain'
       }))
 
-      // 同步写入全局缓存，供 profile / myStats 复用
-      appStore.setTeams(teams)
-
       page.setData({
         teams: processed,
         currentTeamId: finalCurrent,
@@ -41,7 +38,7 @@ const teamSwitcher = {
     } catch (err) {
       console.error('[teamSwitcher] 加载团队失败', err)
       page.setData({ teams: [], hasTeams: false })
-      appStore.setTeams([])
+      appStore.invalidateTeams()
       return []
     }
   },
@@ -65,8 +62,6 @@ const teamSwitcher = {
       isActive: t._id === teamId
     }))
     page.setData({ teams: processed, currentTeamId: teamId })
-    // 同步写入全局缓存，保持 isActive 一致
-    appStore.setTeams(processed)
 
     wx.showToast({ title: '已切换团队', icon: 'none', duration: 800 })
 

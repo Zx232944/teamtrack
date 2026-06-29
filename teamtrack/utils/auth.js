@@ -189,8 +189,26 @@ function setCachedUser(user) {
   try {
     wx.setStorageSync('userInfo', user)
   } catch (e) {}
-  // 同步到共享缓存
-  appStore.setUser(user)
+}
+
+/**
+ * 失效用户缓存（写操作后由页面调用，db.js 不能 require auth 故不在此自动失效）
+ */
+function invalidateUser() {
+  _userInfo = null
+  try {
+    wx.removeStorageSync('userInfo')
+  } catch (e) {}
+}
+
+/**
+ * 从云端拉取最新用户信息并刷新缓存
+ * 替代各页面重复的 getCurrentUser + setCachedUser 模式
+ */
+async function refreshUser() {
+  const user = await db.getCurrentUser()
+  if (user) setCachedUser(user)
+  return user
 }
 
 /**
@@ -241,6 +259,8 @@ module.exports = {
   isLoggedIn,
   getCachedUser,
   setCachedUser,
+  invalidateUser,
+  refreshUser,
   login,
   register,
   promptNickName,
