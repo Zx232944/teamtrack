@@ -13,6 +13,7 @@
 
 const db = require('./db')
 const appStore = require('./appStore')
+const cache = require('./cache')
 
 // 缓存的用户信息
 let _userInfo = null
@@ -203,10 +204,10 @@ function invalidateUser() {
 
 /**
  * 从云端拉取最新用户信息并刷新缓存
- * 替代各页面重复的 getCurrentUser + setCachedUser 模式
+ * 使用轻量 getUserStats 替代 login，避免不必要的团队查询
  */
 async function refreshUser() {
-  const user = await db.getCurrentUser()
+  const user = await db.getUserStats()
   if (user) setCachedUser(user)
   return user
 }
@@ -225,6 +226,9 @@ function logout() {
 
   // 清空共享数据缓存
   appStore.clear()
+
+  // 清空 TTL 内存缓存
+  cache.invalidateAllCache()
 
   // 同步清除全局数据
   try {

@@ -175,10 +175,16 @@ Page({
           wx.showLoading({ title: '领取中...' })
           try {
             await DB.claimTask(id)
-            auth.refreshUser()  // 刷新用户在 users 表的状态，同时保持登录状态
+            // 乐观更新：立即更新本地任务状态
+            const tasks = this.data.tasks.map(t =>
+              t._id === id ? { ...t, status: 'in_progress', statusText: '进行中', statusClass: 'status-in_progress' } : t
+            )
+            this.setData({ tasks })
+            this.applyFilter()
+            auth.refreshUser()  // 后台刷新用户统计（getUserStats 轻量查询）
             wx.hideLoading()
             wx.showToast({ title: '抢单成功！', icon: 'success' })
-            this.loadTasks()
+            this.loadTasks()  // 后台刷新，TTL 缓存已被 invalidate，实际走云端
           } catch (e) {
             wx.hideLoading()
             wx.showToast({ title: e.message || '抢单失败', icon: 'none' })

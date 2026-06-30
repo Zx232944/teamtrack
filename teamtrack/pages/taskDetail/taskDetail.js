@@ -313,10 +313,17 @@ Page({
           wx.showLoading({ title: '处理中...' })
           try {
             await DB.updateTaskStatus(this.taskId, 'completed')
-            auth.refreshUser()  // 刷新用户在 users 表的贡献数据，同时保持登录状态
+            // 乐观更新：立即更新本地任务状态，不等云端返回
+            const t = this.data.task
+            if (t) {
+              this.setData({
+                task: { ...t, status: 'completed', statusText: '已完成', statusClass: 'status-completed' }
+              })
+            }
+            auth.refreshUser()  // 后台刷新用户贡献统计（getUserStats 轻量查询）
             wx.hideLoading()
             wx.showToast({ title: '任务已完成！', icon: 'success' })
-            this.loadDetail()
+            this.loadDetail()  // 后台刷新，TTL 缓存已被 invalidate，实际走云端
           } catch (e) {
             wx.hideLoading()
             wx.showToast({ title: e.message || '操作失败', icon: 'none' })

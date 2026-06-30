@@ -5,6 +5,7 @@
 
 const cloud = require('./cloud')
 const appStore = require('./appStore')
+const cache = require('./cache')
 
 // ============ 当前团队管理 ============
 
@@ -46,6 +47,19 @@ async function getCurrentUser() {
 
 async function updateUserInfo(userInfo) {
   return await cloud.callFunction('updateUser', userInfo)
+}
+
+/**
+ * 轻量级获取用户信息（仅查 users 表，不做团队查询）
+ * 替代 login 云函数用于页面刷新用户统计
+ */
+async function getUserStats() {
+  try {
+    return await cloud.callFunction('getUserStats')
+  } catch (e) {
+    console.warn('[db] 获取用户统计失败', e)
+    return null
+  }
 }
 
 // ============ 团队相关 ============
@@ -98,12 +112,14 @@ async function getTeam(teamId) {
 async function getMembers(teamId) {
   const tid = teamId || getCurrentTeamId()
   if (!tid) return []
-  try {
-    return await cloud.queryCollection('members', { teamId: tid })
-  } catch (e) {
-    console.warn('[db] 获取成员失败', e)
-    return []
-  }
+  return await cache.withCache('getMembers_' + tid, 30000, async () => {
+    try {
+      return await cloud.queryCollection('members', { teamId: tid })
+    } catch (e) {
+      console.warn('[db] 获取成员失败', e)
+      return []
+    }
+  })
 }
 
 /**
@@ -147,18 +163,21 @@ async function quitTeam(teamId) {
 async function getTasks(filter = {}, teamId) {
   const tid = teamId || getCurrentTeamId()
   if (!tid) return []
-  try {
-    const where = { teamId: tid }
-    if (filter.status && filter.status !== 'all') {
-      where.status = filter.status
+  const statusKey = filter.status || 'all'
+  return await cache.withCache('getTasks_' + tid + '_' + statusKey, 30000, async () => {
+    try {
+      const where = { teamId: tid }
+      if (filter.status && filter.status !== 'all') {
+        where.status = filter.status
+      }
+      return await cloud.queryCollection('tasks', where, {
+        orderBy: { field: 'createdAt', direction: 'desc' }
+      })
+    } catch (e) {
+      console.warn('[db] 获取任务失败', e)
+      return []
     }
-    return await cloud.queryCollection('tasks', where, {
-      orderBy: { field: 'createdAt', direction: 'desc' }
-    })
-  } catch (e) {
-    console.warn('[db] 获取任务失败', e)
-    return []
-  }
+  })
 }
 
 async function getTaskDetail(taskId) {
@@ -178,12 +197,15 @@ async function createTask(data) {
   if (!data.teamId) {
     throw new Error('请选择发布到的团队')
   }
+  cache.invalidateCache('getTasks')
   return await cloud.callFunction('createTask', data)
 }
 
 async function claimTask(taskId) {
   const res = await cloud.callFunction('claimTask', { taskId })
   appStore.invalidateTeams()
+  cache.invalidateCache('getTasks')
+  cache.invalidateCache('getMembers')
   return res
 }
 
@@ -191,6 +213,8 @@ async function updateTaskStatus(taskId, status) {
   if (status === 'completed') {
     const res = await cloud.callFunction('completeTask', { taskId })
     appStore.invalidateTeams()
+    cache.invalidateCache('getTasks')
+    cache.invalidateCache('getMembers')
     return res
   }
   return await cloud.updateRecord('tasks', taskId, { status })
@@ -199,15 +223,18 @@ async function updateTaskStatus(taskId, status) {
 // ============ 交付物相关 ============
 
 async function getDeliverables(taskId) {
-  try {
-    const where = taskId ? { taskId } : {}
-    return await cloud.queryCollection('deliverables', where, {
-      orderBy: { field: 'uploadedAt', direction: 'desc' }
-    })
-  } catch (e) {
-    console.warn('[db] 获取交付物失败', e)
-    return []
-  }
+  const cacheKey = taskId ? 'getDeliverables_task_' + taskId : 'getDeliverables_all'
+  return await cache.withCache(cacheKey, 30000, async () => {
+    try {
+      const where = taskId ? { taskId } : {}
+      return await cloud.queryCollection('deliverables', where, {
+        orderBy: { field: 'uploadedAt', direction: 'desc' }
+      })
+    } catch (e) {
+      console.warn('[db] 获取交付物失败', e)
+      return []
+    }
+  })
 }
 
 /**
@@ -215,7 +242,7 @@ async function getDeliverables(taskId) {
  * 流程：1.上传文件到云存储 → 2.调用云函数记录信息
  */
 async function uploadDeliverable(params) {
-  const { taskId, taskTitle, fileName, filePath, user, isLink, linkUrl } = params
+  const { taskId, fileName, filePath, isLink, linkUrl } = params
 
   let fileID = ''
   let size = '未知'
@@ -239,6 +266,7 @@ async function uploadDeliverable(params) {
   }
 
   // 2. 调用云函数记录交付物
+  cache.invalidateCache('getDeliverables')
   return await cloud.callFunction('uploadDeliverable', {
     taskId,
     fileName,
@@ -260,16 +288,18 @@ function formatFileSize(bytes) {
 
 async function getActivities(limit = 20, teamId) {
   const tid = teamId || getCurrentTeamId()
-  try {
-    const where = tid ? { teamId: tid } : {}
-    return await cloud.queryCollection('activities', where, {
-      orderBy: { field: 'time', direction: 'desc' },
-      limit
-    })
-  } catch (e) {
-    console.warn('[db] 获取动态失败', e)
-    return []
-  }
+  return await cache.withCache('getActivities_' + tid + '_' + limit, 30000, async () => {
+    try {
+      const where = tid ? { teamId: tid } : {}
+      return await cloud.queryCollection('activities', where, {
+        orderBy: { field: 'time', direction: 'desc' },
+        limit
+      })
+    } catch (e) {
+      console.warn('[db] 获取动态失败', e)
+      return []
+    }
+  })
 }
 
 // ============ 统计相关 ============
@@ -313,6 +343,7 @@ module.exports = {
   getCurrentTeamId,
   setCurrentTeamId,
   getCurrentUser,
+  getUserStats,
   updateUserInfo,
   getMyTeams,
   getMyTeamsWithCache,
