@@ -98,8 +98,7 @@ async function getTeam(teamId) {
   const tid = teamId || getCurrentTeamId()
   if (!tid) return null
   try {
-    const list = await cloud.queryCollection('teams', {}, { limit: 50 })
-    return list.find(t => t._id === tid) || list[0] || null
+    return await cloud.queryById('teams', tid)
   } catch (e) {
     console.warn('[db] 获取团队失败', e)
     return null

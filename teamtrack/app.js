@@ -61,9 +61,33 @@ App({
       // 简单查询测试（即使集合不存在也不会立即报错）
       this.globalData.cloudReady = true
       console.log('[app] 云开发已就绪')
+
+      // 后台预热数据缓存：登录后会调用 login 云函数填缓存，
+      // 这里只对已登录用户做 teams 缓存预热
+      this.warmupCache()
     } catch (e) {
       console.warn('[app] 云开发不可用，使用模拟数据')
       this.globalData.cloudReady = false
+    }
+  },
+
+  /**
+   * 后台预热缓存：让首页直接命中内存缓存，减少首屏加载时间
+   */
+  async warmupCache() {
+    try {
+      const userInfo = wx.getStorageSync('userInfo')
+      if (!userInfo) return  // 未登录，不预热
+      const auth = require('./utils/auth')
+      const DB = require('./utils/db')
+      // 并行预热：user 缓存 + teams 缓存
+      // 不阻塞 app.onLaunch，页面 onShow 时大概率已就绪
+      await Promise.allSettled([
+        auth.refreshUser(),              // 轻量 getUserStats，填 auth._userInfo + storage
+        DB.getMyTeamsWithCache()         // 缓存优先，miss 才走云端
+      ])
+    } catch (e) {
+      // 预热失败不影响主流程
     }
   }
 })
