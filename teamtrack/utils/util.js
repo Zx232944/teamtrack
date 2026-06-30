@@ -74,8 +74,8 @@ function getStatusClass(status) {
 
 /**
  * 从已完成任务反算每个成员的贡献值和完成数
- * @param {Array} tasks - 当前团队的全部任务
- * @param {Array} members - 当前团队的成员列表
+ * @param {Array} tasks - 当前队伍的全部任务
+ * @param {Array} members - 当前队伍的成员列表
  * @returns {Array} 合并了贡献值的成员列表
  */
 function computeMemberContributions(tasks, members) {

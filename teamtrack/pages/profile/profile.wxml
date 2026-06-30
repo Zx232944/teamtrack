@@ -5,7 +5,7 @@
     <!-- 登录入口（仅在未进入注册流程时显示） -->
     <view class="login-prompt" wx:if="{{!registerStep}}">
       <view class="login-avatar-placeholder">👤</view>
-      <text class="login-title">登录赛队管家</text>
+      <text class="login-title">登录队迹协作工具</text>
       <text class="login-desc text-secondary">首次登录需授权手机号并设置昵称</text>
       <button class="btn-primary login-btn" bindtap="onLogin">微信登录</button>
     </view>
@@ -15,7 +15,7 @@
       <view class="register-card">
         <view class="register-step-badge">第 1 / 2 步</view>
         <text class="register-title">欢迎新用户</text>
-        <text class="register-desc text-secondary">请先授权手机号完成注册（用于团队内联系）</text>
+        <text class="register-desc text-secondary">请先授权手机号完成注册（用于队伍内联系）</text>
         <button class="btn-primary login-btn" open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber">
           授权手机号
         </button>
@@ -28,7 +28,7 @@
       <view class="register-card">
         <view class="register-step-badge">第 2 / 2 步</view>
         <text class="register-title">设置昵称</text>
-        <text class="register-desc text-secondary">请输入你在团队中的昵称，方便队友认出你</text>
+        <text class="register-desc text-secondary">请输入你在队伍中的昵称，方便队友认出你</text>
         <input class="register-input" placeholder="请输入昵称" value="{{tempNickName}}" bindinput="onNickNameInput" maxlength="20" focus="{{true}}" />
         <button class="btn-primary login-btn" bindtap="onSubmitRegister">完成注册</button>
       </view>
@@ -45,7 +45,7 @@
       </view>
     </view>
 
-    <!-- 统计概览（所有团队汇总，点击查看明细） -->
+    <!-- 统计概览（所有队伍汇总，点击查看明细） -->
     <view class="profile-stats" bindtap="goMyStats">
       <view class="ps-item">
         <text class="ps-num text-orange">{{user.contribution || 0}}</text>
@@ -76,21 +76,21 @@
       </view>
     </view>
 
-    <!-- 团队管理 -->
+    <!-- 队伍管理 -->
     <view class="menu-section">
-      <view class="menu-title">团队管理</view>
+      <view class="menu-title">队伍管理</view>
       <view class="menu-item" bindtap="goTeams">
         <view class="menu-icon" style="background: rgba(30, 144, 255, 0.15);">
           <text style="color: #1E90FF;">☰</text>
         </view>
-        <text class="menu-text flex-1">我的团队</text>
+        <text class="menu-text flex-1">我的队伍</text>
         <text class="menu-arrow text-secondary">›</text>
       </view>
       <view class="menu-item" bindtap="goTeam">
         <view class="menu-icon" style="background: rgba(255, 107, 53, 0.15);">
           <text style="color: #FF6B35;">👥</text>
         </view>
-        <text class="menu-text flex-1">当前团队详情</text>
+        <text class="menu-text flex-1">当前队伍详情</text>
         <text class="menu-arrow text-secondary">›</text>
       </view>
     </view>
@@ -102,7 +102,7 @@
         <view class="menu-icon" style="background: rgba(30, 144, 255, 0.15);">
           <text style="color: #1E90FF;">ℹ</text>
         </view>
-        <text class="menu-text flex-1">关于赛队管家</text>
+        <text class="menu-text flex-1">关于队迹协作工具</text>
         <text class="menu-arrow text-secondary">›</text>
       </view>
       <view class="menu-item" bindtap="showHelp">
@@ -123,7 +123,7 @@
 
     <!-- 产品信息 -->
     <view class="product-info">
-      <text class="text-xs text-secondary">赛队管家 TeamTrack v1.0.0</text>
+      <text class="text-xs text-secondary">队迹协作工具 TeamTrack v1.1.0</text>
       <text class="text-xs text-secondary mt-sm">让竞赛协作更高效 · Powered by 微信云开发</text>
     </view>
   </block>

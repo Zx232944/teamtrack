@@ -4,12 +4,12 @@
   <view wx:if="{{!isLoggedIn}}" class="login-prompt">
     <view class="login-avatar-placeholder">👤</view>
     <text class="login-title">登录后查看贡献</text>
-    <text class="login-desc text-secondary">请先登录以使用赛队管家</text>
+    <text class="login-desc text-secondary">请先登录以使用队迹协作工具</text>
     <navigator url="/pages/profile/profile" open-type="switchTab" class="btn-primary login-btn">去登录</navigator>
   </view>
 
   <block wx:else>
-    <!-- 团队切换条 -->
+    <!-- 队伍切换条 -->
     <view class="team-switcher">
       <view class="team-chip-manage" bindtap="goTeamsPage">
         <text class="team-chip-manage-icon">≡</text>
@@ -26,16 +26,16 @@
       </scroll-view>
     </view>
 
-    <!-- 无团队提示 -->
+    <!-- 无队伍提示 -->
     <view wx:if="{{!hasTeams && !loading}}" class="team-empty-hint">
-      还没有团队，贡献数据需要先加入团队
+      还没有队伍，贡献数据需要先加入队伍
     </view>
 
     <!-- 骨架屏 -->
     <skeleton wx:if="{{hasTeams && loading}}" type="dashboard" loading="{{loading}}" />
 
     <block wx:if="{{hasTeams && !loading}}">
-    <!-- 个人贡献概览（当前团队） -->
+    <!-- 个人贡献概览（当前队伍） -->
     <view class="contribution-header">
       <view class="user-card">
         <view class="user-avatar">{{user.nickName ? user.nickName[0] : '我'}}</view>
@@ -45,7 +45,7 @@
         </view>
         <view class="user-score">
           <text class="score-num text-orange">{{myContribution}}</text>
-          <text class="score-label text-xs text-secondary">本团队贡献</text>
+          <text class="score-label text-xs text-secondary">本队伍贡献</text>
         </view>
       </view>
 
@@ -61,7 +61,7 @@
         </view>
         <view class="stat-card-mini">
           <text class="stat-num text-orange">{{rankingList.length}}</text>
-          <text class="stat-text text-xs text-secondary">团队人数</text>
+          <text class="stat-text text-xs text-secondary">队伍人数</text>
         </view>
       </view>
     </view>
@@ -84,10 +84,10 @@
       </view>
     </view>
 
-    <!-- 团队贡献排行 -->
+    <!-- 队伍贡献排行 -->
     <view class="section">
       <view class="section-header">
-        <text class="section-title">团队贡献排行</text>
+        <text class="section-title">队伍贡献排行</text>
       </view>
       <view class="ranking-full">
         <view wx:for="{{rankingList}}" wx:key="_id" class="ranking-full-item">

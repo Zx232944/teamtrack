@@ -59,7 +59,7 @@ Page({
     if (this.data.hasTeams) {
       this.loadTasks()
     } else {
-      // 无团队时清空所有任务数据，避免残留
+      // 无队伍时清空所有任务数据，避免残留
       this.setData({
         loading: false,
         tasks: [],
@@ -72,12 +72,12 @@ Page({
     }
   },
 
-  // 团队切换回调
+  // 队伍切换回调
   onTeamChanged() {
     this.loadTasks()
   },
 
-  // 切换团队
+  // 切换队伍
   onSwitchTeam(e) {
     const teamId = e.currentTarget.dataset.id
     teamSwitcher.switchTo(this, teamId)
@@ -161,7 +161,7 @@ Page({
 
   goCreateTask() {
     if (!this.data.hasTeams) {
-      wx.showToast({ title: '请先创建或加入团队', icon: 'none' })
+      wx.showToast({ title: '请先创建或加入队伍', icon: 'none' })
       return
     }
     wx.navigateTo({ url: '/pages/createTask/createTask' })

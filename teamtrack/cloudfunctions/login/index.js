@@ -31,12 +31,12 @@ exports.main = async (event, context) => {
       data: { lastLoginAt: new Date() }
     })
 
-    // 查询用户所在的团队，确定当前团队
+    // 查询用户所在的队伍，确定当前队伍
     let currentTeamId = null
     try {
       const memberRes = await db.collection('members').where({ openid }).get()
       if (memberRes.data.length > 0) {
-        // 优先使用本地缓存的 currentTeamId，否则取第一个团队
+        // 优先使用本地缓存的 currentTeamId，否则取第一个队伍
         const storedTeamId = event.currentTeamId
         const matched = storedTeamId
           ? memberRes.data.find(m => m.teamId === storedTeamId)
@@ -44,7 +44,7 @@ exports.main = async (event, context) => {
         currentTeamId = (matched && matched.teamId) || memberRes.data[0].teamId
       }
     } catch (e) {
-      console.warn('[login] 查询团队成员失败', e)
+      console.warn('[login] 查询队伍成员失败', e)
     }
 
     return {

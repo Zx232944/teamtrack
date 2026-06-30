@@ -1,6 +1,6 @@
 <!--pages/team/team.wxml-->
 <view class="page">
-  <!-- 团队信息卡片 -->
+  <!-- 队伍信息卡片 -->
   <view class="team-card" wx:if="{{team}}">
     <view class="team-header-row">
       <view class="team-badge-lg">{{team.name[0] || 'T'}}</view>
@@ -27,12 +27,12 @@
     </view>
   </view>
 
-  <!-- 无团队提示 -->
+  <!-- 无队伍提示 -->
   <view wx:if="{{!loading && !team}}" class="empty-team">
-    <text class="text-secondary">还没有团队，去创建或加入一个吧</text>
+    <text class="text-secondary">还没有队伍，去创建或加入一个吧</text>
     <view class="empty-team-btns">
-      <navigator url="/pages/createTeam/createTeam" class="empty-btn primary">创建团队</navigator>
-      <navigator url="/pages/teams/teams" class="empty-btn">团队管理</navigator>
+      <navigator url="/pages/createTeam/createTeam" class="empty-btn primary">创建队伍</navigator>
+      <navigator url="/pages/teams/teams" class="empty-btn">队伍管理</navigator>
     </view>
   </view>
 
@@ -54,7 +54,7 @@
   <!-- 成员列表 -->
   <view class="section" wx:if="{{team}}">
     <view class="section-header">
-      <text class="section-title">团队成员</text>
+      <text class="section-title">队伍成员</text>
       <button class="invite-btn" open-type="share">邀请成员</button>
     </view>
     <view class="member-list">
@@ -80,7 +80,7 @@
   <view class="section" wx:if="{{team}}">
     <view class="invite-card">
       <view class="invite-info">
-        <text class="invite-title">团队邀请码</text>
+        <text class="invite-title">队伍邀请码</text>
         <text class="invite-code">{{inviteCode}}</text>
       </view>
       <view class="invite-action" bindtap="copyCode">
@@ -88,7 +88,7 @@
       </view>
     </view>
     <view class="join-team-btn" bindtap="onJoinTeam">
-      <text>通过邀请码加入其他团队</text>
+      <text>通过邀请码加入其他队伍</text>
     </view>
   </view>
 

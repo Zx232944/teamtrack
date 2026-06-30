@@ -4,7 +4,7 @@
   <view class="top-actions">
     <view class="top-btn top-btn-primary" bindtap="goCreateTeam">
       <text class="top-btn-icon">+</text>
-      <text>创建团队</text>
+      <text>创建队伍</text>
     </view>
     <view class="top-btn top-btn-secondary" bindtap="onJoinByCode">
       <text class="top-btn-icon">⚑</text>
@@ -12,7 +12,7 @@
     </view>
   </view>
 
-  <!-- 团队列表 -->
+  <!-- 队伍列表 -->
   <block wx:if="{{!loading && teams.length > 0}}">
     <view class="team-list">
       <view wx:for="{{teams}}" wx:key="_id" class="team-card {{item.isCurrent ? 'current' : ''}}">
@@ -75,16 +75,16 @@
         <!-- 操作按钮 -->
         <view class="team-card-footer">
           <view wx:if="{{!item.isCurrent}}" class="footer-btn footer-btn-primary" catchtap="onSwitchTeam" data-id="{{item._id}}">
-            切换到此团队
+            切换到此队伍
           </view>
           <view wx:else class="footer-btn footer-btn-disabled">
-            当前团队
+            当前队伍
           </view>
           <view wx:if="{{item.myRole === 'captain'}}" class="footer-btn footer-btn-danger" catchtap="onDissolveTeam" data-id="{{item._id}}" data-name="{{item.name}}">
-            解散团队
+            解散队伍
           </view>
           <view wx:else class="footer-btn footer-btn-warn" catchtap="onQuitTeam" data-id="{{item._id}}" data-name="{{item.name}}">
-            退出团队
+            退出队伍
           </view>
         </view>
       </view>
@@ -95,9 +95,9 @@
   <block wx:elif="{{!loading && teams.length === 0}}">
     <view class="empty-state">
       <view class="empty-icon">👥</view>
-      <text class="empty-title">还没有加入任何团队</text>
-      <text class="empty-desc text-secondary">创建你的第一个团队，或通过邀请码加入</text>
-      <button class="btn-primary" bindtap="goCreateTeam">立即创建团队</button>
+      <text class="empty-title">还没有加入任何队伍</text>
+      <text class="empty-desc text-secondary">创建你的第一个队伍，或通过邀请码加入</text>
+      <button class="btn-primary" bindtap="goCreateTeam">立即创建队伍</button>
     </view>
   </block>
 

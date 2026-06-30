@@ -1,5 +1,5 @@
 // 云函数：getUserStats
-// 轻量级：仅查询 users 表，不做团队查询，比 login 云函数轻 50%+
+// 轻量级：仅查询 users 表，不做队伍查询，比 login 云函数轻 50%+
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 

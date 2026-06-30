@@ -1,7 +1,7 @@
 {
   "name": "quitTeam",
   "version": "1.0.0",
-  "description": "退出/解散团队云函数",
+  "description": "退出/解散队伍云函数",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3"

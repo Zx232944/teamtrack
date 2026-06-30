@@ -1,14 +1,14 @@
 /**
- * 团队切换器公用逻辑
+ * 队伍切换器公用逻辑
  * 在页面的 onLoad/onShow 中调用 teamSwitcher.load(this) 即可
- * 切换团队后会自动重新执行页面的 onLoadTeamsChanged() 方法（如存在）
+ * 切换队伍后会自动重新执行页面的 onLoadTeamsChanged() 方法（如存在）
  */
 const DB = require('./db')
 const appStore = require('./appStore')
 
 const teamSwitcher = {
   /**
-   * 加载团队列表并设置到页面 data
+   * 加载队伍列表并设置到页面 data
    * @param {Object} page 页面实例
    */
   async load(page) {
@@ -36,7 +36,7 @@ const teamSwitcher = {
 
       return processed
     } catch (err) {
-      console.error('[teamSwitcher] 加载团队失败', err)
+      console.error('[teamSwitcher] 加载队伍失败', err)
       page.setData({ teams: [], hasTeams: false })
       appStore.invalidateTeams()
       return []
@@ -44,7 +44,7 @@ const teamSwitcher = {
   },
 
   /**
-   * 切换当前团队
+   * 切换当前队伍
    * @param {Object} page 页面实例
    * @param {string} teamId
    */
@@ -63,7 +63,7 @@ const teamSwitcher = {
     }))
     page.setData({ teams: processed, currentTeamId: teamId })
 
-    wx.showToast({ title: '已切换团队', icon: 'none', duration: 800 })
+    wx.showToast({ title: '已切换队伍', icon: 'none', duration: 800 })
 
     // 触发页面自定义的刷新回调
     if (typeof page.onTeamChanged === 'function') {
@@ -79,14 +79,14 @@ const teamSwitcher = {
   },
 
   /**
-   * 跳转到团队管理页
+   * 跳转到队伍管理页
    */
   goTeamsPage() {
     wx.navigateTo({ url: '/pages/teams/teams' })
   },
 
   /**
-   * 跳转到创建团队页
+   * 跳转到创建队伍页
    */
   goCreateTeam() {
     wx.navigateTo({ url: '/pages/createTeam/createTeam' })

@@ -34,12 +34,12 @@ Page({
     this.init()
   },
 
-  // 处理邀请码：弹窗提示用户加入团队
+  // 处理邀请码：弹窗提示用户加入队伍
   handleInviteCode(code) {
     if (!code) return
     wx.showModal({
-      title: '收到团队邀请',
-      content: `邀请码：${code}\n是否立即加入该团队？`,
+      title: '收到队伍邀请',
+      content: `邀请码：${code}\n是否立即加入该队伍？`,
       confirmText: '立即加入',
       confirmColor: '#FF6B35',
       success: async (res) => {
@@ -106,7 +106,7 @@ Page({
     if (this.data.hasTeams) {
       this.loadData()
     } else {
-      // 无团队时清空所有团队相关数据，避免残留
+      // 无队伍时清空所有队伍相关数据，避免残留
       this.setData({
         team: {},
         stats: { total: 0, completed: 0, inProgress: 0, pending: 0, progress: 0 },
@@ -119,18 +119,18 @@ Page({
     }
   },
 
-  // 团队切换回调
+  // 队伍切换回调
   onTeamChanged() {
     this.loadData()
   },
 
-  // 切换团队
+  // 切换队伍
   onSwitchTeam(e) {
     const teamId = e.currentTarget.dataset.id
     teamSwitcher.switchTo(this, teamId)
   },
 
-  // 跳转团队管理
+  // 跳转队伍管理
   goTeamsPage() {
     teamSwitcher.goTeamsPage()
   },
@@ -217,7 +217,7 @@ Page({
 
   goCreateTask() {
     if (!this.data.hasTeams) {
-      wx.showToast({ title: '请先创建或加入团队', icon: 'none' })
+      wx.showToast({ title: '请先创建或加入队伍', icon: 'none' })
       return
     }
     wx.navigateTo({ url: '/pages/createTask/createTask' })

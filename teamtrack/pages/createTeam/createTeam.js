@@ -52,7 +52,7 @@ Page({
     const { name, competition, description, deadline } = this.data.form
 
     if (!name.trim()) {
-      wx.showToast({ title: '请输入团队名称', icon: 'none' })
+      wx.showToast({ title: '请输入队伍名称', icon: 'none' })
       return
     }
     if (!competition) {

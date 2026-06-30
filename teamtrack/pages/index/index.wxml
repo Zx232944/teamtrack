@@ -3,13 +3,13 @@
   <!-- 未登录提示 -->
   <view wx:if="{{!isLoggedIn}}" class="login-prompt">
     <view class="login-avatar-placeholder">👤</view>
-    <text class="login-title">登录后查看团队</text>
-    <text class="login-desc text-secondary">请先登录以使用赛队管家</text>
+    <text class="login-title">登录后查看队伍</text>
+    <text class="login-desc text-secondary">请先登录以使用队迹协作工具</text>
     <navigator url="/pages/profile/profile" open-type="switchTab" class="btn-primary login-btn">去登录</navigator>
   </view>
 
   <block wx:else>
-    <!-- 团队切换条 -->
+    <!-- 队伍切换条 -->
     <view class="team-switcher">
       <view class="team-chip-manage" bindtap="goTeamsPage">
         <text class="team-chip-manage-icon">≡</text>
@@ -26,15 +26,15 @@
       </scroll-view>
     </view>
 
-    <!-- 无团队提示 -->
+    <!-- 无队伍提示 -->
     <view wx:if="{{!hasTeams && !loading}}" class="team-empty-hint">
-      还没有团队，点击上方"管理"创建或加入团队开始协作
+      还没有队伍，点击上方"管理"创建或加入队伍开始协作
     </view>
 
   <!-- 骨架屏：首次加载时显示 -->
   <skeleton wx:if="{{hasTeams && loading}}" type="dashboard" loading="{{loading}}" />
 
-  <!-- 顶部团队信息 -->
+  <!-- 顶部队伍信息 -->
   <view class="header-section" wx:if="{{hasTeams && !loading}}">
     <view class="team-info">
       <view class="team-header">
@@ -103,7 +103,7 @@
       <view class="action-icon" style="background: rgba(255, 215, 0, 0.15);">
         <text style="color: #FFD700;">◔</text>
       </view>
-      <text class="action-text">团队管理</text>
+      <text class="action-text">队伍管理</text>
     </view>
   </view>
 

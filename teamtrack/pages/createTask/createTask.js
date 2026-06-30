@@ -32,7 +32,7 @@ Page({
       if (teams.length === 0) {
         wx.showModal({
           title: '提示',
-          content: '你还没有加入任何团队，请先创建或加入团队',
+          content: '你还没有加入任何队伍，请先创建或加入队伍',
           showCancel: false,
           confirmColor: '#FF6B35',
           success: () => {
@@ -55,8 +55,8 @@ Page({
         'form.teamId': teams[teamIndex]._id
       })
     } catch (err) {
-      console.error('加载团队失败', err)
-      wx.showToast({ title: '加载团队失败', icon: 'none' })
+      console.error('加载队伍失败', err)
+      wx.showToast({ title: '加载队伍失败', icon: 'none' })
     }
   },
 
@@ -93,7 +93,7 @@ Page({
     const { title, description, deadline, teamId } = this.data.form
 
     if (!teamId) {
-      wx.showToast({ title: '请选择发布到的团队', icon: 'none' })
+      wx.showToast({ title: '请选择发布到的队伍', icon: 'none' })
       return
     }
     if (!title.trim()) {

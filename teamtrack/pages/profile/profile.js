@@ -104,7 +104,7 @@ Page({
   onSkipPhone() {
     wx.showModal({
       title: '提示',
-      content: '不授权手机号将无法在团队中相互联系，确定跳过吗？',
+      content: '不授权手机号将无法在队伍中相互联系，确定跳过吗？',
       confirmColor: '#FF6B35',
       success: (res) => {
         if (res.confirm) {
@@ -170,7 +170,7 @@ Page({
   onLogout() {
     wx.showModal({
       title: '退出登录',
-      content: '退出后将清除所有团队数据，确定要退出吗？',
+      content: '退出后将清除所有队伍数据，确定要退出吗？',
       confirmColor: '#FF6B35',
       success: (res) => {
         if (res.confirm) {
@@ -208,8 +208,8 @@ Page({
 
   showAbout() {
     wx.showModal({
-      title: '关于赛队管家',
-      content: '赛队管家 TeamTrack v1.0.0\n\n专为大学生竞赛团队打造的轻量级协作管理工具。解决进度不透明、责任推诿、队长一人焦虑的痛点，让团队管理不再依赖人情。\n\n核心功能：任务抢单、进度追踪、贡献举证、团队管理、文件版本管理（基于微信云开发）。',
+      title: '关于队迹协作工具',
+      content: '队迹协作工具 TeamTrack v1.0.0\n\n专为大学生竞赛队伍打造的轻量级协作管理工具。解决进度不透明、责任分配不合理、任务难以复盘的痛点，让队伍管理不再依赖人情。\n\n核心功能：任务抢单、进度追踪、贡献举证、队伍管理、文件版本管理（基于微信云开发）。',
       showCancel: false,
       confirmColor: '#FF6B35'
     })
@@ -218,7 +218,7 @@ Page({
   showHelp() {
     wx.showModal({
       title: '使用帮助',
-      content: '1. 队长创建团队，获得邀请码\n2. 队员通过邀请码加入团队\n3. 队长发布任务，设置截止时间和分值\n4. 队员在任务中心"抢单"领取任务\n5. 完成任务后上传交付物（支持文件/链接/图片）\n6. 系统自动记录贡献度和文件版本\n7. 查看排行榜了解团队贡献分布',
+      content: '1. 队长创建队伍，获得邀请码\n2. 队员通过邀请码加入队伍\n3. 队长发布任务，设置截止时间和分值\n4. 队员在任务中心"抢单"领取任务\n5. 完成任务后上传交付物（支持文件/链接/图片）\n6. 系统自动记录贡献度和文件版本\n7. 查看排行榜了解队伍贡献分布',
       showCancel: false,
       confirmColor: '#FF6B35'
     })

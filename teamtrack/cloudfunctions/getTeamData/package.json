@@ -1,7 +1,7 @@
 {
   "name": "getTeamData",
   "version": "1.0.0",
-  "description": "获取团队完整数据",
+  "description": "获取队伍完整数据",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3"

@@ -14,7 +14,7 @@ const _store = new Map()
 
 /**
  * 带 TTL 的缓存读取
- * @param {string}   key  缓存键（需包含团队ID等区分维度）
+ * @param {string}   key  缓存键（需包含队伍ID等区分维度）
  * @param {number}   ttl  有效期（毫秒），默认 30s
  * @param {Function} fn   数据获取函数，仅缓存 miss 时调用
  * @returns {Promise<any>}

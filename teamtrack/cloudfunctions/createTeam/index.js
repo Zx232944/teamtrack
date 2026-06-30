@@ -1,5 +1,5 @@
 // 云函数：createTeam
-// 创建团队，并自动将创建者设为队长
+// 创建队伍，并自动将创建者设为队长
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -14,7 +14,7 @@ exports.main = async (event, context) => {
     // 生成邀请码（6位）
     const inviteCode = generateInviteCode()
 
-    // 1. 创建团队
+    // 1. 创建队伍
     const teamResult = await db.collection('teams').add({
       data: {
         name: event.name,
@@ -36,7 +36,7 @@ exports.main = async (event, context) => {
       if (userRes.data.length > 0) {
         user = userRes.data[0]
       } else {
-        // 用户未注册，不应该能创建团队
+        // 用户未注册，不应该能创建队伍
         return {
           code: -1,
           message: '请先完成注册（登录并设置昵称）'
@@ -46,7 +46,7 @@ exports.main = async (event, context) => {
       console.warn('[createTeam] 查询用户失败', e)
     }
 
-    // 3. 添加队长为团队成员
+    // 3. 添加队长为队伍成员
     await db.collection('members').add({
       data: {
         teamId: teamResult._id,
@@ -77,7 +77,7 @@ exports.main = async (event, context) => {
         teamId: teamResult._id,
         inviteCode
       },
-      message: '团队创建成功'
+      message: '队伍创建成功'
     }
   } catch (err) {
     return {

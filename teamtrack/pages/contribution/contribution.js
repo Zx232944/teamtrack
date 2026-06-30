@@ -60,7 +60,7 @@ Page({
     if (this.data.hasTeams) {
       this.loadData()
     } else {
-      // 无团队时清空所有贡献数据，避免残留
+      // 无队伍时清空所有贡献数据，避免残留
       this.setData({
         myContribution: 0,
         myCompletedTasks: 0,
@@ -73,12 +73,12 @@ Page({
     }
   },
 
-  // 团队切换回调
+  // 队伍切换回调
   onTeamChanged() {
     this.loadData()
   },
 
-  // 切换团队
+  // 切换队伍
   onSwitchTeam(e) {
     const teamId = e.currentTarget.dataset.id
     teamSwitcher.switchTo(this, teamId)
@@ -107,7 +107,7 @@ Page({
       // 从已完成任务反算贡献值，避免云函数未及时更新导致显示 0
       const computedMembers = util.computeMemberContributions(tasks, members)
 
-      // 从当前团队的 members 中找出当前用户的信息（贡献值按团队计算）
+      // 从当前队伍的 members 中找出当前用户的信息（贡献值按队伍计算）
       const openid = wx.getStorageSync('openid')
       const myMember = computedMembers.find(m => m.openid === openid) || {}
 

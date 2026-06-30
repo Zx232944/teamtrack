@@ -51,7 +51,7 @@ exports.main = async (event, context) => {
       } catch (e) {}
     }
 
-    // 仅更新当前团队该成员的进行中任务数（多团队隔离）
+    // 仅更新当前队伍该成员的进行中任务数（多队伍隔离）
     try {
       await db.collection('members').where({
         openid,
@@ -61,7 +61,7 @@ exports.main = async (event, context) => {
       })
     } catch (e) {}
 
-    // 记录动态（带 teamId 以便首页按团队过滤）
+    // 记录动态（带 teamId 以便首页按队伍过滤）
     try {
       await db.collection('activities').add({
         data: {

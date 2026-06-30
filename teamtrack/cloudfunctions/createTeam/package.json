@@ -1,7 +1,7 @@
 {
   "name": "createTeam",
   "version": "1.0.0",
-  "description": "创建团队云函数",
+  "description": "创建队伍云函数",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3"

@@ -1,13 +1,13 @@
 /**
  * 数据访问层 - 纯云后端
- * 支持多团队管理，可通过切换当前团队查看不同团队的数据
+ * 支持多队伍管理，可通过切换当前队伍查看不同队伍的数据
  */
 
 const cloud = require('./cloud')
 const appStore = require('./appStore')
 const cache = require('./cache')
 
-// ============ 当前团队管理 ============
+// ============ 当前队伍管理 ============
 
 const CURRENT_TEAM_KEY = 'currentTeamId'
 
@@ -50,7 +50,7 @@ async function updateUserInfo(userInfo) {
 }
 
 /**
- * 轻量级获取用户信息（仅查 users 表，不做团队查询）
+ * 轻量级获取用户信息（仅查 users 表，不做队伍查询）
  * 替代 login 云函数用于页面刷新用户统计
  */
 async function getUserStats() {
@@ -62,23 +62,23 @@ async function getUserStats() {
   }
 }
 
-// ============ 团队相关 ============
+// ============ 队伍相关 ============
 
 /**
- * 获取我加入的所有团队
+ * 获取我加入的所有队伍
  */
 async function getMyTeams() {
   try {
     const res = await cloud.callFunction('getMyTeams')
     return res || []
   } catch (e) {
-    console.warn('[db] 获取团队列表失败', e)
+    console.warn('[db] 获取队伍列表失败', e)
     return []
   }
 }
 
 /**
- * 缓存优先拉取团队列表
+ * 缓存优先拉取队伍列表
  * @param {boolean} force true 跳过缓存直接拉取
  */
 async function getMyTeamsWithCache(force = false) {
@@ -92,7 +92,7 @@ async function getMyTeamsWithCache(force = false) {
 }
 
 /**
- * 获取当前团队信息（或指定团队）
+ * 获取当前队伍信息（或指定队伍）
  */
 async function getTeam(teamId) {
   const tid = teamId || getCurrentTeamId()
@@ -100,13 +100,13 @@ async function getTeam(teamId) {
   try {
     return await cloud.queryById('teams', tid)
   } catch (e) {
-    console.warn('[db] 获取团队失败', e)
+    console.warn('[db] 获取队伍失败', e)
     return null
   }
 }
 
 /**
- * 获取团队成员
+ * 获取队伍成员
  */
 async function getMembers(teamId) {
   const tid = teamId || getCurrentTeamId()
@@ -122,11 +122,11 @@ async function getMembers(teamId) {
 }
 
 /**
- * 创建团队
+ * 创建队伍
  */
 async function createTeam(data) {
   const res = await cloud.callFunction('createTeam', data)
-  // 创建成功后自动切换为当前团队
+  // 创建成功后自动切换为当前队伍
   if (res && res.teamId) {
     setCurrentTeamId(res.teamId)
   }
@@ -135,11 +135,11 @@ async function createTeam(data) {
 }
 
 /**
- * 通过邀请码加入团队
+ * 通过邀请码加入队伍
  */
 async function joinTeam(inviteCode) {
   const res = await cloud.callFunction('joinTeam', { inviteCode })
-  // 加入成功后自动切换为当前团队
+  // 加入成功后自动切换为当前队伍
   if (res && res.teamId) {
     setCurrentTeamId(res.teamId)
   }
@@ -148,7 +148,7 @@ async function joinTeam(inviteCode) {
 }
 
 /**
- * 退出团队（队员）/ 解散团队（队长）
+ * 退出队伍（队员）/ 解散队伍（队长）
  * @param {string} teamId
  */
 async function quitTeam(teamId) {
@@ -189,12 +189,12 @@ async function getTaskDetail(taskId) {
 }
 
 /**
- * 创建任务到指定团队
+ * 创建任务到指定队伍
  * @param {Object} data 任务数据，需包含 teamId
  */
 async function createTask(data) {
   if (!data.teamId) {
-    throw new Error('请选择发布到的团队')
+    throw new Error('请选择发布到的队伍')
   }
   cache.invalidateCache('getTasks')
   return await cloud.callFunction('createTask', data)
@@ -237,7 +237,7 @@ async function getDeliverables(taskId) {
 }
 
 /**
- * 按团队获取交付物（替代无参 getDeliverables 的全库扫描）
+ * 按队伍获取交付物（替代无参 getDeliverables 的全库扫描）
  * deliverables 表已写入 teamId 字段（见 uploadDeliverable 云函数）
  */
 async function getTeamDeliverables(teamId) {
@@ -249,7 +249,7 @@ async function getTeamDeliverables(teamId) {
         orderBy: { field: 'uploadedAt', direction: 'desc' }
       })
     } catch (e) {
-      console.warn('[db] 获取团队交付物失败', e)
+      console.warn('[db] 获取队伍交付物失败', e)
       return []
     }
   })
@@ -284,7 +284,7 @@ async function uploadDeliverable(params) {
   }
 
   // 2. 调用云函数记录交付物
-  // 失效所有交付物缓存（按任务和按团队），确保 taskDetail 和贡献页实时更新
+  // 失效所有交付物缓存（按任务和按队伍），确保 taskDetail 和贡献页实时更新
   cache.invalidateCache('getDeliverables')
   const currentTeamId = getCurrentTeamId()
   if (currentTeamId) {

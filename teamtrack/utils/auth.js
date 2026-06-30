@@ -83,7 +83,7 @@ function login() {
             wx.setStorageSync('userInfo', user)
           } catch (e) {}
 
-          // 同步当前团队
+          // 同步当前队伍
           if (res.result.currentTeamId) {
             try {
               const db = require('./db')
@@ -149,7 +149,7 @@ function promptNickName(placeholder) {
   return new Promise((resolve, reject) => {
     wx.showModal({
       title: '设置昵称',
-      content: '请输入你在团队中的昵称，方便队友认出你',
+      content: '请输入你在队伍中的昵称，方便队友认出你',
       editable: true,
       placeholderText: placeholder || '请输入昵称',
       confirmColor: '#FF6B35',
@@ -204,7 +204,7 @@ function invalidateUser() {
 
 /**
  * 从云端拉取最新用户信息并刷新缓存
- * 使用轻量 getUserStats 替代 login，避免不必要的团队查询
+ * 使用轻量 getUserStats 替代 login，避免不必要的队伍查询
  */
 async function refreshUser() {
   const user = await db.getUserStats()

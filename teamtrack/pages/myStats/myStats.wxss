@@ -61,7 +61,7 @@
   padding-left: 8rpx;
 }
 
-/* 团队统计卡片 */
+/* 队伍统计卡片 */
 .team-stat-card {
   background: #1A1A2E;
   border-radius: 20rpx;

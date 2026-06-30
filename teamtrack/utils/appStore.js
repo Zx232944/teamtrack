@@ -1,5 +1,5 @@
 /**
- * 全局共享数据缓存 - 团队列表
+ * 全局共享数据缓存 - 队伍列表
  * user 缓存归 auth.js 管理，本模块只管 teams。
  * 缓存只存 getMyTeams 云函数返回的原始格式，不含 isActive/isCaptain 等派生字段。
  *
@@ -13,7 +13,7 @@ const TEAM_CACHE_KEY = 'cache_teams_v2'
 let _teams = null
 
 /**
- * 同步读取团队列表缓存（内存优先 → storage 回填）
+ * 同步读取队伍列表缓存（内存优先 → storage 回填）
  * @returns {Array|null} teams，null 表示无缓存
  */
 function getTeams() {
@@ -27,7 +27,7 @@ function getTeams() {
 }
 
 /**
- * 写入团队列表缓存（仅原始格式，拒绝派生字段）
+ * 写入队伍列表缓存（仅原始格式，拒绝派生字段）
  */
 function setTeams(teams) {
   _teams = teams || []
@@ -37,7 +37,7 @@ function setTeams(teams) {
 }
 
 /**
- * 失效团队列表缓存（写操作后调用）
+ * 失效队伍列表缓存（写操作后调用）
  */
 function invalidateTeams() {
   _teams = null

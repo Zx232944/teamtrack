@@ -14,7 +14,7 @@
   "window": {
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#0F0F1A",
-    "navigationBarTitleText": "赛队管家",
+    "navigationBarTitleText": "队迹协作工具",
     "navigationBarTextStyle": "white",
     "backgroundColor": "#0F0F1A"
   },
@@ -48,7 +48,7 @@
   "lazyCodeLoading": "requiredComponents",
   "permission": {
     "scope.userInfo": {
-      "desc": "用于在团队中展示你的昵称和头像"
+      "desc": "用于在队伍中展示你的昵称和头像"
     },
     "scope.writePhotosAlbum": {
       "desc": "用于将队友上传的图片交付物保存到你的相册"

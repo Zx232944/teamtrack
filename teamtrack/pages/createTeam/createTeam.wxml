@@ -2,7 +2,7 @@
 <view class="page">
   <view class="form-section">
     <view class="form-item">
-      <text class="form-label">团队名称</text>
+      <text class="form-label">队伍名称</text>
       <input class="form-input" placeholder="如：智创未来" value="{{form.name}}" bindinput="onInput" data-field="name" />
     </view>
 
@@ -34,6 +34,6 @@
 
   <view class="form-actions">
     <button class="btn-secondary" bindtap="onCancel">取消</button>
-    <button class="btn-primary" bindtap="onSubmit" loading="{{submitting}}">创建团队</button>
+    <button class="btn-primary" bindtap="onSubmit" loading="{{submitting}}">创建队伍</button>
   </view>
 </view>

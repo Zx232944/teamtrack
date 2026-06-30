@@ -58,7 +58,7 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 仅更新当前团队该成员的贡献度（多团队隔离）
+    // 仅更新当前队伍该成员的贡献度（多队伍隔离）
     try {
       const memberUpdate = await db.collection('members').where({
         openid,
@@ -70,12 +70,12 @@ exports.main = async (event, context) => {
           ongoingTasks: db.command.inc(-1)
         }
       })
-      console.log('[completeTask] 团队成员贡献更新', memberUpdate.stats || memberUpdate)
+      console.log('[completeTask] 队伍成员贡献更新', memberUpdate.stats || memberUpdate)
     } catch (e) {
-      console.warn('[completeTask] 更新团队成员贡献失败', e)
+      console.warn('[completeTask] 更新队伍成员贡献失败', e)
     }
 
-    // 记录动态（带 teamId 以便首页按团队过滤）
+    // 记录动态（带 teamId 以便首页按队伍过滤）
     try {
       await db.collection('activities').add({
         data: {

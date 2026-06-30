@@ -1,5 +1,5 @@
 // 云函数：getMyTeams
-// 获取当前用户加入的所有团队（按团队拆分统计直接从 tasks 表实时计算）
+// 获取当前用户加入的所有队伍（按队伍拆分统计直接从 tasks 表实时计算）
 // 使用 aggregate 聚合统计，避免 .get() 100 条上限导致统计偏少
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
@@ -14,7 +14,7 @@ exports.main = async (event, context) => {
   const openid = wxContext.OPENID || event.openid || 'dev_default_user'
 
   try {
-    // 1. 查询用户加入的所有团队成员记录
+    // 1. 查询用户加入的所有队伍成员记录
     const memberRes = await db.collection('members').where({ openid }).get()
     const memberships = memberRes.data
 
@@ -22,7 +22,7 @@ exports.main = async (event, context) => {
       return { code: 0, data: [] }
     }
 
-    // 2. 批量查询团队信息
+    // 2. 批量查询队伍信息
     const teamIds = memberships.map(m => m.teamId)
     const teamsResult = await db.collection('teams')
       .where({ _id: _.in(teamIds) })
@@ -74,7 +74,7 @@ exports.main = async (event, context) => {
       statsByTeam[row._id].ongoing = row.ongoing || 0
     })
 
-    // 4. 组装团队信息（统计直接从 tasks 表实时计算，不依赖 members 表的预聚合字段）
+    // 4. 组装队伍信息（统计直接从 tasks 表实时计算，不依赖 members 表的预聚合字段）
     const teams = teamsResult.data.map(team => {
       const myMember = memberships.find(m => m.teamId === team._id) || {}
       const stats = statsByTeam[team._id] || { completed: 0, ongoing: 0, contribution: 0 }

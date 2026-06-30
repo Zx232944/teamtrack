@@ -1,4 +1,4 @@
-// app.js - 赛队管家小程序入口
+// app.js - 队迹协作工具小程序入口
 App({
   globalData: {
     userInfo: null,

@@ -1,4 +1,4 @@
-// pages/teams/teams.js - 多团队管理
+// pages/teams/teams.js - 多队伍管理
 const DB = require('../../utils/db')
 
 Page({
@@ -36,14 +36,14 @@ Page({
       const teams = await DB.getMyTeamsWithCache(this._force)
       const currentTeamId = DB.getCurrentTeamId()
 
-      // 如果没设置当前团队但有团队数据，默认选第一个
+      // 如果没设置当前队伍但有队伍数据，默认选第一个
       let finalCurrent = currentTeamId
       if (!finalCurrent && teams.length > 0) {
         finalCurrent = teams[0]._id
         DB.setCurrentTeamId(finalCurrent)
       }
 
-      // 标记当前选中的团队
+      // 标记当前选中的队伍
       const processed = teams.map(t => ({
         ...t,
         isCurrent: t._id === finalCurrent,
@@ -56,12 +56,12 @@ Page({
         loading: false
       })
     } catch (err) {
-      console.error('加载团队列表失败', err)
+      console.error('加载队伍列表失败', err)
       this.setData({ loading: false })
     }
   },
 
-  // 切换当前团队
+  // 切换当前队伍
   onSwitchTeam(e) {
     const teamId = e.currentTarget.dataset.id
     if (teamId === this.data.currentTeamId) return
@@ -72,17 +72,17 @@ Page({
       isCurrent: t._id === teamId
     }))
     this.setData({ teams, currentTeamId: teamId })
-    wx.showToast({ title: '已切换团队', icon: 'success', duration: 800 })
+    wx.showToast({ title: '已切换队伍', icon: 'success', duration: 800 })
   },
 
-  // 进入团队详情
+  // 进入队伍详情
   goTeamDetail(e) {
     const teamId = e.currentTarget.dataset.id
     DB.setCurrentTeamId(teamId)
     wx.navigateTo({ url: '/pages/team/team' })
   },
 
-  // 创建新团队
+  // 创建新队伍
   goCreateTeam() {
     wx.navigateTo({ url: '/pages/createTeam/createTeam' })
   },
@@ -90,7 +90,7 @@ Page({
   // 通过邀请码加入
   onJoinByCode() {
     wx.showModal({
-      title: '加入团队',
+      title: '加入队伍',
       editable: true,
       placeholderText: '请输入6位邀请码',
       confirmColor: '#FF6B35',
@@ -127,10 +127,10 @@ Page({
     })
   },
 
-  // 微信邀请好友（分享卡片，带当前点击的团队邀请码）
+  // 微信邀请好友（分享卡片，带当前点击的队伍邀请码）
   onShareAppMessage(e) {
     const data = (e && e.target && e.target.dataset) || {}
-    const teamName = data.name || '我的团队'
+    const teamName = data.name || '我的队伍'
     const inviteCode = data.code || ''
     let title = `邀请你加入"${teamName}"`
     if (inviteCode) {
@@ -143,12 +143,12 @@ Page({
     }
   },
 
-  // 队长：解散团队
+  // 队长：解散队伍
   onDissolveTeam(e) {
     const { id, name } = e.currentTarget.dataset
     wx.showModal({
-      title: '解散团队',
-      content: `确定要解散团队"${name}"吗？所有成员、任务和交付物将被永久删除，且无法恢复。`,
+      title: '解散队伍',
+      content: `确定要解散队伍"${name}"吗？所有成员、任务和交付物将被永久删除，且无法恢复。`,
       confirmText: '确认解散',
       confirmColor: '#FF4757',
       success: async (res) => {
@@ -158,11 +158,11 @@ Page({
             const result = await DB.quitTeam(id)
             wx.hideLoading()
             if (result && result.code === 0) {
-              // 如果解散的是当前团队，清除当前团队ID
+              // 如果解散的是当前队伍，清除当前队伍ID
               if (id === this.data.currentTeamId) {
                 DB.setCurrentTeamId('')
               }
-              wx.showToast({ title: '团队已解散', icon: 'success' })
+              wx.showToast({ title: '队伍已解散', icon: 'success' })
               this.loadTeams()
             } else {
               wx.showToast({ title: (result && result.message) || '解散失败', icon: 'none' })
@@ -176,12 +176,12 @@ Page({
     })
   },
 
-  // 队员：退出团队
+  // 队员：退出队伍
   onQuitTeam(e) {
     const { id, name } = e.currentTarget.dataset
     wx.showModal({
-      title: '退出团队',
-      content: `确定要退出团队"${name}"吗？退出后将无法查看该团队的任务和贡献。`,
+      title: '退出队伍',
+      content: `确定要退出队伍"${name}"吗？退出后将无法查看该队伍的任务和贡献。`,
       confirmText: '确认退出',
       confirmColor: '#FF6B35',
       success: async (res) => {
@@ -191,11 +191,11 @@ Page({
             const result = await DB.quitTeam(id)
             wx.hideLoading()
             if (result && result.code === 0) {
-              // 如果退出的是当前团队，清除当前团队ID
+              // 如果退出的是当前队伍，清除当前队伍ID
               if (id === this.data.currentTeamId) {
                 DB.setCurrentTeamId('')
               }
-              wx.showToast({ title: '已退出团队', icon: 'success' })
+              wx.showToast({ title: '已退出队伍', icon: 'success' })
               this.loadTeams()
             } else {
               wx.showToast({ title: (result && result.message) || '退出失败', icon: 'none' })

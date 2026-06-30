@@ -1,7 +1,7 @@
 {
   "name": "getMyTeams",
   "version": "1.0.0",
-  "description": "获取当前用户加入的所有团队",
+  "description": "获取当前用户加入的所有队伍",
   "main": "index.js",
   "dependencies": {
     "wx-server-sdk": "~2.6.3"

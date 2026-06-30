@@ -1,7 +1,7 @@
 // 云函数：quitTeam
-// 退出团队（队员）或解散团队（队长）
+// 退出队伍（队员）或解散队伍（队长）
 // users 表的 contribution/completedTasks/ongoingTasks 为全局累计字段，
-// 由 claimTask/completeTask 维护，因此退出/解散时需按团队任务数据反向扣减。
+// 由 claimTask/completeTask 维护，因此退出/解散时需按队伍任务数据反向扣减。
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -15,22 +15,22 @@ exports.main = async (event, context) => {
   const teamId = event.teamId
 
   if (!teamId) {
-    return { code: -1, message: '缺少团队ID' }
+    return { code: -1, message: '缺少队伍ID' }
   }
 
   try {
-    // 获取团队成员记录
+    // 获取队伍成员记录
     const memberRes = await db.collection('members').where({ openid, teamId }).get()
     if (memberRes.data.length === 0) {
-      return { code: -1, message: '你不在该团队中' }
+      return { code: -1, message: '你不在该队伍中' }
     }
 
     const member = memberRes.data[0]
     const isCaptain = member.role === 'captain'
 
     if (isCaptain) {
-      // ===== 队长：解散团队 =====
-      // 1. 查询团队所有任务（用于扣减成员数据 + 清理交付物）
+      // ===== 队长：解散队伍 =====
+      // 1. 查询队伍所有任务（用于扣减成员数据 + 清理交付物）
       const tasksRes = await db.collection('tasks').where({ teamId }).get()
       const taskIds = tasksRes.data.map(t => t._id)
 
@@ -71,7 +71,7 @@ exports.main = async (event, context) => {
       // 3. 删除所有成员记录
       await db.collection('members').where({ teamId }).remove()
 
-      // 4. 删除团队所有任务，并清理交付物
+      // 4. 删除队伍所有任务，并清理交付物
       try {
         if (taskIds.length > 0) {
           await db.collection('tasks').where({ teamId }).remove()
@@ -81,22 +81,22 @@ exports.main = async (event, context) => {
         console.warn('[quitTeam] 清理任务/交付物失败', e)
       }
 
-      // 5. 删除团队动态
+      // 5. 删除队伍动态
       try {
         await db.collection('activities').where({ teamId }).remove()
       } catch (e) {}
 
-      // 6. 删除团队记录
+      // 6. 删除队伍记录
       await db.collection('teams').doc(teamId).remove()
 
       return {
         code: 0,
         action: 'dissolve',
-        message: '团队已解散'
+        message: '队伍已解散'
       }
     } else {
-      // ===== 队员：退出团队 =====
-      // 1. 统计该队员在该团队的任务数据，反向扣减 users 表
+      // ===== 队员：退出队伍 =====
+      // 1. 统计该队员在该队伍的任务数据，反向扣减 users 表
       const myTasksRes = await db.collection('tasks').where({ teamId, assigneeId: openid }).get()
       let myContribution = 0, myCompleted = 0, myOngoing = 0
       myTasksRes.data.forEach(t => {
@@ -128,7 +128,7 @@ exports.main = async (event, context) => {
       // 2. 删除该成员记录
       await db.collection('members').doc(member._id).remove()
 
-      // 3. 团队成员数 -1
+      // 3. 队伍成员数 -1
       try {
         const teamRes = await db.collection('teams').doc(teamId).get()
         const team = teamRes.data
@@ -178,7 +178,7 @@ exports.main = async (event, context) => {
       return {
         code: 0,
         action: 'quit',
-        message: '已退出团队'
+        message: '已退出队伍'
       }
     }
   } catch (err) {

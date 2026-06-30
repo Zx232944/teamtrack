@@ -178,7 +178,7 @@
   border: none;
 }
 
-/* 切换团队按钮 */
+/* 切换队伍按钮 */
 .switch-team-btn {
   padding: 8rpx 20rpx;
   background: rgba(30, 144, 255, 0.15);
@@ -187,7 +187,7 @@
   font-size: 24rpx;
 }
 
-/* 无团队空状态 */
+/* 无队伍空状态 */
 .empty-team {
   padding: 80rpx 40rpx;
   text-align: center;

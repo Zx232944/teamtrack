@@ -170,7 +170,7 @@ view, text, scroll-view {
   font-size: 28rpx;
 }
 
-/* ===== 团队切换条（多团队管理） ===== */
+/* ===== 队伍切换条（多队伍管理） ===== */
 .team-switcher {
   background: #1A1A2E;
   padding: 16rpx 24rpx;
@@ -245,7 +245,7 @@ view, text, scroll-view {
   color: #A0A0B0;
 }
 
-/* 团队管理入口（统一在管理页内创建/加入） */
+/* 队伍管理入口（统一在管理页内创建/加入） */
 .team-chip-manage {
   flex-shrink: 0;
   display: inline-flex;

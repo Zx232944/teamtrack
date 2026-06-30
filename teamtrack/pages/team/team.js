@@ -1,4 +1,4 @@
-// pages/team/team.js - 团队详情页（显示当前团队信息）
+// pages/team/team.js - 队伍详情页（显示当前队伍信息）
 const DB = require('../../utils/db')
 
 Page({
@@ -7,7 +7,7 @@ Page({
     members: [],
     inviteCode: '------',
     timeline: [
-      { step: 1, title: '团队组建', date: '待定', done: false, current: true },
+      { step: 1, title: '队伍组建', date: '待定', done: false, current: true },
       { step: 2, title: '需求分析', date: '待定', done: false, current: false },
       { step: 3, title: '方案设计', date: '待定', done: false, current: false },
       { step: 4, title: '开发实施', date: '待定', done: false, current: false },
@@ -38,7 +38,7 @@ Page({
         return
       }
 
-      // 计算团队进度
+      // 计算队伍进度
       const tasks = await DB.getTasks({ status: 'all' })
       const completedCount = tasks.filter(t => t.status === 'completed').length
       team.progress = tasks.length > 0
@@ -70,7 +70,7 @@ Page({
         loading: false
       })
     } catch (err) {
-      console.error('加载团队信息失败', err)
+      console.error('加载队伍信息失败', err)
       this.setData({ loading: false })
     }
   },
@@ -92,23 +92,23 @@ Page({
   // 邀请成员 - 通过分享小程序卡片
   onInvite() {
     if (!this.data.team) {
-      wx.showToast({ title: '请先创建团队', icon: 'none' })
+      wx.showToast({ title: '请先创建队伍', icon: 'none' })
       return
     }
     // 触发分享（需要 button open-type="share"）
     wx.showModal({
       title: '邀请成员',
-      content: `邀请码：${this.data.inviteCode}\n\n点击右上角"..."→"转发"或下方"邀请成员"按钮分享给好友，好友打开后输入邀请码即可加入团队。`,
+      content: `邀请码：${this.data.inviteCode}\n\n点击右上角"..."→"转发"或下方"邀请成员"按钮分享给好友，好友打开后输入邀请码即可加入队伍。`,
       showCancel: false,
       confirmColor: '#FF6B35',
       confirmText: '知道了'
     })
   },
 
-  // 加入其他团队
+  // 加入其他队伍
   onJoinTeam() {
     wx.showModal({
-      title: '加入团队',
+      title: '加入队伍',
       editable: true,
       placeholderText: '请输入6位邀请码',
       confirmColor: '#FF6B35',
@@ -134,7 +134,7 @@ Page({
     })
   },
 
-  // 跳转到团队管理（多团队切换）
+  // 跳转到队伍管理（多队伍切换）
   goTeamsPage() {
     wx.navigateTo({ url: '/pages/teams/teams' })
   },
@@ -143,7 +143,7 @@ Page({
   onShareAppMessage() {
     const team = this.data.team || {}
     return {
-      title: `邀请你加入「${team.name || '赛队管家'}」团队`,
+      title: `邀请你加入「${team.name || '队迹协作工具'}」队伍`,
       path: `/pages/index/index?inviteCode=${this.data.inviteCode}`,
       imageUrl: ''
     }

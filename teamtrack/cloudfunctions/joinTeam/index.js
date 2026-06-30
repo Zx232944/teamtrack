@@ -1,5 +1,5 @@
 // 云函数：joinTeam
-// 通过邀请码加入团队
+// 通过邀请码加入队伍
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -17,7 +17,7 @@ exports.main = async (event, context) => {
       return { code: -1, message: '邀请码不能为空' }
     }
 
-    // 查询团队
+    // 查询队伍
     const teamRes = await db.collection('teams').where({ inviteCode }).get()
 
     if (teamRes.data.length === 0) {
@@ -33,7 +33,7 @@ exports.main = async (event, context) => {
     }).get()
 
     if (memberRes.data.length > 0) {
-      return { code: -1, message: '你已加入该团队' }
+      return { code: -1, message: '你已加入该队伍' }
     }
 
     // 获取用户信息（必须已注册，不应在此自动创建）
@@ -65,7 +65,7 @@ exports.main = async (event, context) => {
       }
     })
 
-    // 更新团队成员数
+    // 更新队伍成员数
     await db.collection('teams').doc(team._id).update({
       data: { memberCount: db.command.inc(1) }
     })

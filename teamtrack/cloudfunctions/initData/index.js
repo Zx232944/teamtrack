@@ -27,7 +27,7 @@ const collections = [
   },
   {
     name: 'teams',
-    description: '团队表',
+    description: '队伍表',
     fields: {
       _id: 'string',
       name: 'string',
@@ -61,7 +61,7 @@ const collections = [
   },
   {
     name: 'members',
-    description: '团队成员表',
+    description: '队伍成员表',
     fields: {
       _id: 'string',
       teamId: 'string',
@@ -187,7 +187,7 @@ const seedData = {
       _id: 'task_005',
       teamId: 'team_001',
       title: '路演PPT制作',
-      description: '制作项目路演PPT，包含项目亮点、团队介绍、发展规划等。',
+      description: '制作项目路演PPT，包含项目亮点、队伍介绍、发展规划等。',
       category: '文档',
       status: 'pending',
       assigneeId: null,
@@ -217,7 +217,7 @@ const seedData = {
       _id: 'task_007',
       teamId: 'team_001',
       title: '答辩演练',
-      description: '组织团队进行模拟答辩，完善答辩话术和演示流程。',
+      description: '组织队伍进行模拟答辩，完善答辩话术和演示流程。',
       category: '其他',
       status: 'pending',
       assigneeId: null,

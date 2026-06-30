@@ -20,12 +20,12 @@
       </view>
     </view>
     <view class="summary-meta text-xs text-secondary">
-      共 {{teams.length}} 个团队
+      共 {{teams.length}} 个队伍
     </view>
   </view>
 
-  <!-- 按团队拆分 -->
-  <view class="section-title">按团队分布</view>
+  <!-- 按队伍拆分 -->
+  <view class="section-title">按队伍分布</view>
 
   <block wx:if="{{!loading && teams.length > 0}}">
     <view class="team-stat-card" wx:for="{{teams}}" wx:key="_id">
@@ -58,7 +58,7 @@
       </view>
 
       <view class="tsc-footer">
-        <view class="tsc-link" catchtap="goContribution" data-id="{{item._id}}">查看团队贡献榜 ›</view>
+        <view class="tsc-link" catchtap="goContribution" data-id="{{item._id}}">查看队伍贡献榜 ›</view>
       </view>
     </view>
   </block>
@@ -67,8 +67,8 @@
   <block wx:elif="{{!loading && teams.length === 0}}">
     <view class="empty-state">
       <view class="empty-icon">📊</view>
-      <text class="empty-title">暂无团队数据</text>
-      <text class="empty-desc text-secondary">加入团队后可查看累计贡献明细</text>
+      <text class="empty-title">暂无队伍数据</text>
+      <text class="empty-desc text-secondary">加入队伍后可查看累计贡献明细</text>
     </view>
   </block>
 

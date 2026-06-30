@@ -1,5 +1,5 @@
-// pages/myStats/myStats.js - 累计数据详情（按团队拆分）
-// total 取 users 表全局累计字段；按团队分布直接调用 getMyTeams 实时统计
+// pages/myStats/myStats.js - 累计数据详情（按队伍拆分）
+// total 取 users 表全局累计字段；按队伍分布直接调用 getMyTeams 实时统计
 const auth = require('../../utils/auth')
 const DB = require('../../utils/db')
 
@@ -66,7 +66,7 @@ Page({
     }
   },
 
-  // 跳转到团队详情
+  // 跳转到队伍详情
   goTeamDetail(e) {
     const teamId = e.currentTarget.dataset.id
     if (teamId) {
@@ -75,7 +75,7 @@ Page({
     }
   },
 
-  // 跳转到贡献页查看该团队排行
+  // 跳转到贡献页查看该队伍排行
   goContribution(e) {
     const teamId = e.currentTarget.dataset.id
     if (teamId) {

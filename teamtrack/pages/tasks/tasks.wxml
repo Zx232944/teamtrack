@@ -4,12 +4,12 @@
   <view wx:if="{{!isLoggedIn}}" class="login-prompt">
     <view class="login-avatar-placeholder">👤</view>
     <text class="login-title">登录后查看任务</text>
-    <text class="login-desc text-secondary">请先登录以使用赛队管家</text>
+    <text class="login-desc text-secondary">请先登录以使用队迹协作工具</text>
     <navigator url="/pages/profile/profile" open-type="switchTab" class="btn-primary login-btn">去登录</navigator>
   </view>
 
   <block wx:else>
-    <!-- 团队切换条 -->
+    <!-- 队伍切换条 -->
     <view class="team-switcher">
       <view class="team-chip-manage" bindtap="goTeamsPage">
         <text class="team-chip-manage-icon">≡</text>
@@ -81,11 +81,11 @@
       </view>
     </view>
 
-    <!-- 无团队空状态 -->
+    <!-- 无队伍空状态 -->
     <view wx:if="{{!hasTeams}}" class="empty-state">
       <text class="empty-icon">👥</text>
-      <text class="empty-text">还没有团队</text>
-      <view class="empty-btn" bindtap="goTeamsPage">去管理团队</view>
+      <text class="empty-text">还没有队伍</text>
+      <view class="empty-btn" bindtap="goTeamsPage">去管理队伍</view>
     </view>
 
     <!-- 空状态 -->
