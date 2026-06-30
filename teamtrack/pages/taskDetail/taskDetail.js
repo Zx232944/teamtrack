@@ -248,13 +248,23 @@ Page({
         })
       } catch (err) {
         wx.hideLoading()
-        wx.showToast({ title: '图片加载失败', icon: 'none' })
+        this.showFileError(err.message || '图片加载失败')
       }
       return
     }
 
-    // 4. 其他文件：下载并用系统打开（支持菜单保存/分享）
-    wx.showLoading({ title: '下载文件...', mask: true })
+    // 4. 其他文件：弹窗选择"在线预览"或"保存到本地"
+    const tapIndex = await new Promise(resolve => {
+      wx.showActionSheet({
+        itemList: ['在线预览', '保存到本地'],
+        success: (res) => resolve(res.tapIndex),
+        fail: () => resolve(-1)
+      })
+    })
+    if (tapIndex === -1) return
+
+    const saveToAlbum = tapIndex === 1
+    wx.showLoading({ title: saveToAlbum ? '保存中...' : '下载文件...', mask: true })
     try {
       const cloud = require('../../utils/cloud')
       const tempUrl = await cloud.getTempFileURL(deliverable.fileID)
@@ -262,27 +272,86 @@ Page({
         url: tempUrl,
         success: (res) => {
           wx.hideLoading()
-          if (res.statusCode === 200) {
+          if (res.statusCode !== 200) {
+            this.showFileError('下载失败（HTTP ' + res.statusCode + '）')
+            return
+          }
+          if (saveToAlbum) {
+            this.saveToLocal(res.tempFilePath, ext)
+          } else {
             wx.openDocument({
               filePath: res.tempFilePath,
               showMenu: true,
               fail: () => {
-                wx.showToast({ title: '无法打开此文件格式', icon: 'none' })
+                this.showFileError('无法预览此格式，可尝试"保存到本地"')
               }
             })
-          } else {
-            wx.showToast({ title: '下载失败', icon: 'none' })
           }
         },
-        fail: () => {
+        fail: (err) => {
           wx.hideLoading()
-          wx.showToast({ title: '下载失败', icon: 'none' })
+          this.showFileError(err.errMsg || '下载失败')
         }
       })
     } catch (err) {
       wx.hideLoading()
-      wx.showToast({ title: '获取文件失败', icon: 'none' })
+      this.showFileError(err.message || '获取文件失败')
     }
+  },
+
+  // 保存到本地（图片走相册，其他文件走文档管理器）
+  saveToLocal(tempFilePath, ext) {
+    const imgExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp']
+    if (imgExt.indexOf(ext) !== -1) {
+      wx.saveImageToPhotosAlbum({
+        filePath: tempFilePath,
+        success: () => wx.showToast({ title: '已保存到相册', icon: 'success' }),
+        fail: (err) => {
+          if (err.errMsg && err.errMsg.indexOf('auth deny') !== -1) {
+            wx.showModal({
+              title: '需要相册权限',
+              content: '请在设置中开启"保存到相册"权限',
+              confirmText: '去设置',
+              confirmColor: '#FF6B35',
+              success: (r) => { if (r.confirm) wx.openSetting() }
+            })
+          } else {
+            this.showFileError(err.errMsg || '保存失败')
+          }
+        }
+      })
+    } else {
+      // 非图片：用 openDocument 让用户通过右上角菜单保存/转发
+      wx.openDocument({
+        filePath: tempFilePath,
+        showMenu: true,
+        success: () => wx.showToast({ title: '点击右上角可保存', icon: 'none' }),
+        fail: () => this.showFileError('无法打开此格式')
+      })
+    }
+  },
+
+  // 统一的文件错误提示（带具体原因）
+  showFileError(msg) {
+    wx.showModal({
+      title: '文件访问失败',
+      content: msg + '\n\n可能原因：\n1. 云存储权限未设为"所有用户可读"\n2. 文件已被删除',
+      showCancel: true,
+      cancelText: '关闭',
+      confirmText: '查看设置',
+      confirmColor: '#FF6B35',
+      success: (res) => {
+        if (res.confirm) {
+          // 引导用户去检查云存储权限
+          wx.showModal({
+            title: '云存储权限设置',
+            content: '请前往微信开发者工具 → 云开发 → 存储 → 权限设置，将规则改为：所有用户可读，仅创建者可写',
+            showCancel: false,
+            confirmColor: '#FF6B35'
+          })
+        }
+      }
+    })
   },
 
   // 打开在线链接
@@ -312,18 +381,21 @@ Page({
         if (res.confirm) {
           wx.showLoading({ title: '处理中...' })
           try {
-            await DB.updateTaskStatus(this.taskId, 'completed')
-            // 乐观更新：立即更新本地任务状态，不等云端返回
+            const res = await DB.updateTaskStatus(this.taskId, 'completed')
+            // 乐观更新：立即更新本地任务状态
             const t = this.data.task
             if (t) {
               this.setData({
                 task: { ...t, status: 'completed', statusText: '已完成', statusClass: 'status-completed' }
               })
             }
-            auth.refreshUser()  // 后台刷新用户贡献统计（getUserStats 轻量查询）
+            // 云函数已返回最新用户统计，直接更新缓存，省一次 getUserStats 调用
+            if (res && res.user) {
+              auth.setCachedUser(res.user)
+            }
             wx.hideLoading()
             wx.showToast({ title: '任务已完成！', icon: 'success' })
-            this.loadDetail()  // 后台刷新，TTL 缓存已被 invalidate，实际走云端
+            this.loadDetail()
           } catch (e) {
             wx.hideLoading()
             wx.showToast({ title: e.message || '操作失败', icon: 'none' })

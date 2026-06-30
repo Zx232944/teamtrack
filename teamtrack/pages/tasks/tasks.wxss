@@ -24,7 +24,11 @@
   border-radius: 32rpx;
   font-size: 26rpx;
   color: #A0A0B0;
-  transition: all 0.3s;
+  transition: all 0.25s ease;
+}
+
+.filter-item:active {
+  transform: scale(0.95);
 }
 
 .filter-item.active {
@@ -56,6 +60,13 @@
   border: 1rpx solid rgba(255, 255, 255, 0.05);
   position: relative;
   overflow: hidden;
+  transition: transform 0.15s ease, background 0.15s ease;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.task-card:active {
+  transform: scale(0.98);
+  background: #252540;
 }
 
 .task-card::before {
@@ -180,6 +191,12 @@
   justify-content: center;
   box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.4);
   z-index: 100;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fab-btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 53, 0.5);
 }
 
 .fab-icon {

@@ -49,6 +49,9 @@
   "permission": {
     "scope.userInfo": {
       "desc": "用于在团队中展示你的昵称和头像"
+    },
+    "scope.writePhotosAlbum": {
+      "desc": "用于将队友上传的图片交付物保存到你的相册"
     }
   }
 }

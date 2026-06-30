@@ -96,7 +96,10 @@ Page({
       this.setData({ tasks: [], filteredTasks: [], loading: false })
       return
     }
-    this.setData({ loading: true })
+    // 首次加载显示骨架屏，后续 onShow 刷新静默进行
+    const isFirstLoad = !this._tasksLoadedOnce
+    this.setData({ loading: isFirstLoad })
+    this._tasksLoadedOnce = true
     try {
       const tasks = await DB.getTasks()
       const processed = tasks.map(t => {
@@ -174,17 +177,20 @@ Page({
         if (res.confirm) {
           wx.showLoading({ title: '领取中...' })
           try {
-            await DB.claimTask(id)
+            const res = await DB.claimTask(id)
             // 乐观更新：立即更新本地任务状态
             const tasks = this.data.tasks.map(t =>
               t._id === id ? { ...t, status: 'in_progress', statusText: '进行中', statusClass: 'status-in_progress' } : t
             )
             this.setData({ tasks })
             this.applyFilter()
-            auth.refreshUser()  // 后台刷新用户统计（getUserStats 轻量查询）
+            // 云函数已返回最新用户统计，直接更新缓存，省一次 getUserStats 调用
+            if (res && res.user) {
+              auth.setCachedUser(res.user)
+            }
             wx.hideLoading()
             wx.showToast({ title: '抢单成功！', icon: 'success' })
-            this.loadTasks()  // 后台刷新，TTL 缓存已被 invalidate，实际走云端
+            this.loadTasks()
           } catch (e) {
             wx.hideLoading()
             wx.showToast({ title: e.message || '抢单失败', icon: 'none' })

@@ -22,7 +22,8 @@ Page({
     inProgressTasks: [],
     completedTasks: [],
     rankingList: [],
-    activities: []
+    activities: [],
+    loading: true  // 骨架屏控制
   },
 
   onLoad(options) {
@@ -139,7 +140,10 @@ Page({
   },
 
   async loadData() {
-    wx.showLoading({ title: '加载中...' })
+    // 首次进入显示骨架屏，后续刷新（onShow）走 loading=false 静默更新
+    const isFirstLoad = !this._loadedOnce
+    if (isFirstLoad) this.setData({ loading: true })
+    this._loadedOnce = true
 
     try {
       const [team, tasks, members, activities] = await Promise.all([
@@ -150,8 +154,7 @@ Page({
       ])
 
       if (!team) {
-        this.setData({ team: {}, stats: { total: 0, completed: 0, inProgress: 0, pending: 0, progress: 0 } })
-        wx.hideLoading()
+        this.setData({ team: {}, stats: { total: 0, completed: 0, inProgress: 0, pending: 0, progress: 0 }, loading: false })
         return
       }
 
@@ -202,13 +205,13 @@ Page({
         inProgressTasks,
         completedTasks,
         rankingList,
-        activities: processedActivities
+        activities: processedActivities,
+        loading: false
       })
     } catch (err) {
       console.error('加载数据失败', err)
+      this.setData({ loading: false })
       wx.showToast({ title: '加载失败', icon: 'none' })
-    } finally {
-      wx.hideLoading()
     }
   },
 

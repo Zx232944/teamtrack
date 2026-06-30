@@ -40,6 +40,7 @@ exports.main = async (event, context) => {
     } catch (e) {}
 
     // 更新用户总贡献度（全局）
+    let updatedUser = null
     if (user._id) {
       try {
         await db.collection('users').doc(user._id).update({
@@ -49,6 +50,9 @@ exports.main = async (event, context) => {
             ongoingTasks: db.command.inc(-1)
           }
         })
+        // 回查最新统计，前端用此直接更新缓存
+        const refreshed = await db.collection('users').doc(user._id).get()
+        updatedUser = refreshed.data
       } catch (e) {
         console.warn('[completeTask] 更新用户贡献失败', e)
       }
@@ -86,7 +90,7 @@ exports.main = async (event, context) => {
       })
     } catch (e) {}
 
-    return { code: 0, message: '任务已完成', data: { points } }
+    return { code: 0, message: '任务已完成', data: { points, user: updatedUser } }
   } catch (err) {
     return { code: -1, message: '操作失败: ' + err.message }
   }

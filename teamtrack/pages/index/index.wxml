@@ -27,12 +27,15 @@
     </view>
 
     <!-- 无团队提示 -->
-    <view wx:if="{{!hasTeams}}" class="team-empty-hint">
+    <view wx:if="{{!hasTeams && !loading}}" class="team-empty-hint">
       还没有团队，点击上方"管理"创建或加入团队开始协作
     </view>
 
+  <!-- 骨架屏：首次加载时显示 -->
+  <skeleton wx:if="{{hasTeams && loading}}" type="dashboard" loading="{{loading}}" />
+
   <!-- 顶部团队信息 -->
-  <view class="header-section" wx:if="{{hasTeams}}">
+  <view class="header-section" wx:if="{{hasTeams && !loading}}">
     <view class="team-info">
       <view class="team-header">
         <view class="team-badge">T</view>
@@ -77,7 +80,7 @@
   </view>
 
   <!-- 快捷操作 -->
-  <view class="quick-actions">
+  <view class="quick-actions fade-in-up">
     <view class="action-item" bindtap="goCreateTask">
       <view class="action-icon" style="background: rgba(255, 107, 53, 0.15);">
         <text style="color: #FF6B35;">+</text>

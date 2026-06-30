@@ -39,11 +39,15 @@ exports.main = async (event, context) => {
     })
 
     // 更新用户进行中任务数
+    let updatedUser = null
     if (user._id) {
       try {
         await db.collection('users').doc(user._id).update({
           data: { ongoingTasks: db.command.inc(1) }
         })
+        // 回查最新统计，前端用此直接更新缓存
+        const refreshed = await db.collection('users').doc(user._id).get()
+        updatedUser = refreshed.data
       } catch (e) {}
     }
 
@@ -72,7 +76,7 @@ exports.main = async (event, context) => {
       })
     } catch (e) {}
 
-    return { code: 0, message: '抢单成功' }
+    return { code: 0, message: '抢单成功', data: { user: updatedUser } }
   } catch (err) {
     return { code: -1, message: '领取失败: ' + err.message }
   }

@@ -1,0 +1,55 @@
+<!--components/skeleton/skeleton.wxml-->
+<view class="skeleton-wrap" wx:if="{{loading}}">
+  <!-- 卡片骨架 -->
+  <block wx:if="{{type === 'card'}}">
+    <view class="sk-card" wx:for="{{count || [1]}}" wx:key="index">
+      <view class="sk-line sk-title"></view>
+      <view class="sk-line sk-text"></view>
+      <view class="sk-line sk-text short"></view>
+    </view>
+  </block>
+
+  <!-- 列表骨架 -->
+  <block wx:if="{{type === 'list'}}">
+    <view class="sk-list-item" wx:for="{{count || [1,2,3]}}" wx:key="index">
+      <view class="sk-avatar"></view>
+      <view class="sk-list-content">
+        <view class="sk-line sk-text"></view>
+        <view class="sk-line sk-text short"></view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 首页概览骨架 -->
+  <block wx:if="{{type === 'dashboard'}}">
+    <view class="sk-dashboard-card">
+      <view class="sk-circle"></view>
+      <view class="sk-stats">
+        <view class="sk-line sk-text" wx:for="{{[1,2,3,4]}}" wx:key="*this"></view>
+      </view>
+    </view>
+    <view class="sk-actions">
+      <view class="sk-action" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+        <view class="sk-action-icon"></view>
+        <view class="sk-line sk-text short"></view>
+      </view>
+    </view>
+    <view class="sk-card" wx:for="{{[1,2]}}" wx:key="*this">
+      <view class="sk-line sk-title"></view>
+      <view class="sk-line sk-text"></view>
+      <view class="sk-line sk-text short"></view>
+    </view>
+  </block>
+
+  <!-- 排行榜骨架 -->
+  <block wx:if="{{type === 'ranking'}}">
+    <view class="sk-list-item" wx:for="{{[1,2,3,4,5]}}" wx:key="*this">
+      <view class="sk-rank-badge"></view>
+      <view class="sk-list-content flex-1">
+        <view class="sk-line sk-text"></view>
+        <view class="sk-bar"></view>
+      </view>
+      <view class="sk-line sk-text short"></view>
+    </view>
+  </block>
+</view>

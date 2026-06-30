@@ -205,7 +205,7 @@ async function claimTask(taskId) {
   appStore.invalidateTeams()
   cache.invalidateCache('getTasks')
   cache.invalidateCache('getMembers')
-  return res
+  return res  // res.data.user 为最新用户统计
 }
 
 async function updateTaskStatus(taskId, status) {
@@ -214,7 +214,7 @@ async function updateTaskStatus(taskId, status) {
     appStore.invalidateTeams()
     cache.invalidateCache('getTasks')
     cache.invalidateCache('getMembers')
-    return res
+    return res  // res.data.user 为最新用户统计
   }
   return await cloud.updateRecord('tasks', taskId, { status })
 }
@@ -231,6 +231,25 @@ async function getDeliverables(taskId) {
       })
     } catch (e) {
       console.warn('[db] 获取交付物失败', e)
+      return []
+    }
+  })
+}
+
+/**
+ * 按团队获取交付物（替代无参 getDeliverables 的全库扫描）
+ * deliverables 表已写入 teamId 字段（见 uploadDeliverable 云函数）
+ */
+async function getTeamDeliverables(teamId) {
+  const tid = teamId || getCurrentTeamId()
+  if (!tid) return []
+  return await cache.withCache('getDeliverables_team_' + tid, 30000, async () => {
+    try {
+      return await cloud.queryCollection('deliverables', { teamId: tid }, {
+        orderBy: { field: 'uploadedAt', direction: 'desc' }
+      })
+    } catch (e) {
+      console.warn('[db] 获取团队交付物失败', e)
       return []
     }
   })
@@ -265,7 +284,12 @@ async function uploadDeliverable(params) {
   }
 
   // 2. 调用云函数记录交付物
+  // 失效所有交付物缓存（按任务和按团队），确保 taskDetail 和贡献页实时更新
   cache.invalidateCache('getDeliverables')
+  const currentTeamId = getCurrentTeamId()
+  if (currentTeamId) {
+    cache.invalidateCache('getDeliverables_team_' + currentTeamId)
+  }
   return await cloud.callFunction('uploadDeliverable', {
     taskId,
     fileName,
@@ -358,6 +382,7 @@ module.exports = {
   claimTask,
   updateTaskStatus,
   getDeliverables,
+  getTeamDeliverables,
   uploadDeliverable,
   getActivities,
   getStats

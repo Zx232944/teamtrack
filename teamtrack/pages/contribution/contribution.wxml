@@ -27,11 +27,14 @@
     </view>
 
     <!-- 无团队提示 -->
-    <view wx:if="{{!hasTeams}}" class="team-empty-hint">
+    <view wx:if="{{!hasTeams && !loading}}" class="team-empty-hint">
       还没有团队，贡献数据需要先加入团队
     </view>
 
-    <block wx:if="{{hasTeams}}">
+    <!-- 骨架屏 -->
+    <skeleton wx:if="{{hasTeams && loading}}" type="dashboard" loading="{{loading}}" />
+
+    <block wx:if="{{hasTeams && !loading}}">
     <!-- 个人贡献概览（当前团队） -->
     <view class="contribution-header">
       <view class="user-card">

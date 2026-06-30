@@ -48,7 +48,10 @@
 
   <!-- 任务列表 -->
   <scroll-view scroll-y class="task-list" refresher-enabled bindrefresherrefresh="onRefresh" refresher-triggered="{{refreshing}}">
-    <view wx:if="{{filteredTasks.length > 0}}">
+    <!-- 骨架屏 -->
+    <skeleton wx:if="{{loading && hasTeams}}" type="card" count="{{[1,2,3,4]}}" loading="{{loading}}" />
+
+    <view wx:if="{{!loading && filteredTasks.length > 0}}">
       <view wx:for="{{filteredTasks}}" wx:key="_id" class="task-card" bindtap="goTaskDetail" data-id="{{item._id}}">
         <view class="task-card-header">
           <view class="task-category-tag tag tag-blue">{{item.category}}</view>

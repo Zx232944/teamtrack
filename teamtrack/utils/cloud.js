@@ -180,6 +180,7 @@ function deleteFile(fileID) {
 
 /**
  * 获取临时下载链接
+ * 返回 { url, status, errMsg }，便于上层区分错误类型
  */
 function getTempFileURL(fileID) {
   return new Promise((resolve, reject) => {
@@ -188,8 +189,25 @@ function getTempFileURL(fileID) {
     }
     wx.cloud.getTempFileURL({
       fileList: [fileID],
-      success: (res) => resolve(res.fileList[0].tempFileURL),
-      fail: (err) => reject(err)
+      success: (res) => {
+        const item = res.fileList && res.fileList[0]
+        if (!item) {
+          return reject(new Error('文件不存在'))
+        }
+        // status: 0 成功, -1 失败
+        if (item.status === 0 && item.tempFileURL) {
+          resolve(item.tempFileURL)
+        } else {
+          // 常见 errMsg: "errno -1 errmsg -202703 open file starlink..."
+          // 通常因云存储权限设置为"仅创建者可读写"导致
+          const errMsg = item.errMsg || '获取链接失败'
+          const tip = errMsg.indexOf('-202') !== -1 || errMsg.indexOf('permission') !== -1
+            ? '文件权限不足，请检查云存储权限是否为"所有用户可读"'
+            : errMsg
+          reject(new Error(tip))
+        }
+      },
+      fail: (err) => reject(new Error(err.errMsg || '获取下载链接失败'))
     })
   })
 }
