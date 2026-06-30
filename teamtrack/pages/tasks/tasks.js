@@ -175,7 +175,7 @@ Page({
           wx.showLoading({ title: '领取中...' })
           try {
             await DB.claimTask(id)
-            auth.invalidateUser()
+            auth.refreshUser()  // 刷新用户在 users 表的状态，同时保持登录状态
             wx.hideLoading()
             wx.showToast({ title: '抢单成功！', icon: 'success' })
             this.loadTasks()

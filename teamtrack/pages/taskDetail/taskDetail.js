@@ -313,7 +313,7 @@ Page({
           wx.showLoading({ title: '处理中...' })
           try {
             await DB.updateTaskStatus(this.taskId, 'completed')
-            auth.invalidateUser()
+            auth.refreshUser()  // 刷新用户在 users 表的贡献数据，同时保持登录状态
             wx.hideLoading()
             wx.showToast({ title: '任务已完成！', icon: 'success' })
             this.loadDetail()
