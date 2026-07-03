@@ -9,7 +9,8 @@
     "pages/createTask/createTask",
     "pages/createTeam/createTeam",
     "pages/taskDetail/taskDetail",
-    "pages/myStats/myStats"
+    "pages/myStats/myStats",
+    "pages/memberDetail/memberDetail"
   ],
   "window": {
     "backgroundTextStyle": "dark",

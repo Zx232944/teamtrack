@@ -58,7 +58,8 @@
       <button class="invite-btn" open-type="share">邀请成员</button>
     </view>
     <view class="member-list">
-      <view wx:for="{{members}}" wx:key="_id" class="member-item">
+      <view wx:for="{{members}}" wx:key="_id" class="member-item"
+        bindtap="goMemberDetail" data-item="{{item}}">
         <view class="member-avatar">{{item.nickName[0]}}</view>
         <view class="flex-1">
           <view class="flex gap-sm align-center">

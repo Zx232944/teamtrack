@@ -15,9 +15,9 @@ Page({
   },
 
   onShow() {
-    // 避免与 onLoad 重复请求，仅在实际需要刷新时加载
+    // 进入页面强制拉云端，确保跨设备创建/加入/退出队伍后能立即看到
     if (this._loaded) {
-      this._force = false
+      this._force = true
       this.loadTeams()
     }
   },

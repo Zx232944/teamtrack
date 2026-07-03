@@ -1,0 +1,90 @@
+<!--pages/memberDetail/memberDetail.wxml-->
+<view class="page">
+  <!-- 成员信息卡片 -->
+  <view class="member-card" wx:if="{{member}}">
+    <view class="member-header-row">
+      <view class="member-avatar-lg">{{member.nickName ? member.nickName[0] : '?'}}</view>
+      <view class="member-info">
+        <text class="member-name-lg">{{member.nickName || '队友'}}</text>
+        <view class="tag {{member.role === 'captain' ? 'tag-orange' : 'tag-blue'}}">{{member.role === 'captain' ? '队长' : '队员'}}</view>
+      </view>
+      <view class="member-score">
+        <text class="score-num text-orange">{{member.contribution}}</text>
+        <text class="score-label text-xs text-secondary">本队伍贡献</text>
+      </view>
+    </view>
+
+    <view class="member-stats">
+      <view class="stat-card-mini">
+        <text class="stat-num text-green">{{member.completedTasks}}</text>
+        <text class="stat-text text-xs text-secondary">已完成任务</text>
+      </view>
+      <view class="stat-card-mini">
+        <text class="stat-num text-blue">{{totalDeliverables}}</text>
+        <text class="stat-text text-xs text-secondary">交付物</text>
+      </view>
+      <view class="stat-card-mini">
+        <text class="stat-num text-orange">{{member.percentage}}%</text>
+        <text class="stat-text text-xs text-secondary">贡献占比</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 骨架屏 -->
+  <skeleton wx:if="{{loading}}" type="list" loading="{{loading}}" />
+
+  <block wx:if="{{!loading}}">
+    <!-- 该成员的任务 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">领取的任务</text>
+        <text class="text-sm text-secondary">共{{tasks.length}}个</text>
+      </view>
+      <view class="task-list" wx:if="{{tasks.length > 0}}">
+        <view wx:for="{{tasks}}" wx:key="_id" class="task-item"
+          bindtap="goTaskDetail" data-id="{{item._id}}">
+          <view class="task-info">
+            <text class="task-title">{{item.title}}</text>
+            <view class="task-meta">
+              <view class="tag {{item.statusClass}}">{{item.statusText}}</view>
+              <text class="text-xs text-secondary">{{item.createdAtText}}</text>
+            </view>
+          </view>
+          <text class="task-arrow text-secondary">›</text>
+        </view>
+      </view>
+      <view wx:else class="empty-hint text-secondary">该成员还未领取任务</view>
+    </view>
+
+    <!-- 该成员的交付物 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">上传的交付物</text>
+        <text class="text-sm text-secondary">共{{deliverables.length}}个</text>
+      </view>
+      <view class="deliverable-list" wx:if="{{deliverables.length > 0}}">
+        <view wx:for="{{deliverables}}" wx:key="_id" class="deliverable-item"
+          bindtap="onPreviewDeliverable" data-item="{{item}}">
+          <view class="del-icon" style="background: {{item.iconColor}};">
+            <text>{{item.iconText}}</text>
+          </view>
+          <view class="del-info flex-1">
+            <text class="del-name">{{item.fileName}}</text>
+            <view class="del-meta">
+              <text class="text-xs text-secondary">{{item.size}}</text>
+              <text class="text-xs text-secondary">·</text>
+              <text class="text-xs text-secondary">v{{item.version}}</text>
+            </view>
+          </view>
+          <view class="del-right">
+            <text class="text-xs text-secondary">{{item.uploadedAtText}}</text>
+            <text class="del-action text-orange">预览</text>
+          </view>
+        </view>
+      </view>
+      <view wx:else class="empty-hint text-secondary">该成员还未上传交付物</view>
+    </view>
+  </block>
+
+  <view class="bottom-space"></view>
+</view>

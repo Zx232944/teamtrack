@@ -139,6 +139,27 @@ Page({
     wx.navigateTo({ url: '/pages/teams/teams' })
   },
 
+  // 跳转到队友详情页
+  goMemberDetail(e) {
+    const item = e.currentTarget.dataset.item || {}
+    const openid = item.openid || item.userId || ''
+    if (!openid) {
+      wx.showToast({ title: '无法查看该成员', icon: 'none' })
+      return
+    }
+    const tid = this.data.team && this.data.team._id
+    const params = [
+      'openid=' + openid,
+      'nickName=' + encodeURIComponent(item.nickName || ''),
+      'role=' + (item.role || 'member'),
+      'contribution=' + (item.contribution || 0),
+      'completedTasks=' + (item.completedTasks || 0),
+      'percentage=' + (item.percentage || 0),
+      'teamId=' + (tid || '')
+    ].join('&')
+    wx.navigateTo({ url: '/pages/memberDetail/memberDetail?' + params })
+  },
+
   // 分享邀请
   onShareAppMessage() {
     const team = this.data.team || {}

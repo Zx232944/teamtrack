@@ -90,7 +90,8 @@
         <text class="section-title">队伍贡献排行</text>
       </view>
       <view class="ranking-full">
-        <view wx:for="{{rankingList}}" wx:key="_id" class="ranking-full-item">
+        <view wx:for="{{rankingList}}" wx:key="_id" class="ranking-full-item"
+          bindtap="goMemberDetail" data-item="{{item}}">
           <view class="rank-num-box rank-{{index + 1}}">
             <text wx:if="{{index < 3}}" class="rank-emoji">{{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}}</text>
             <text wx:else class="rank-text">{{index + 1}}</text>

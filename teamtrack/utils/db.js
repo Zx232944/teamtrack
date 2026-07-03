@@ -307,6 +307,54 @@ function formatFileSize(bytes) {
   return (bytes / 1024 / 1024 / 1024).toFixed(2) + ' GB'
 }
 
+// ============ 成员维度查询（用于队友详情页） ============
+
+/**
+ * 获取某成员在某队伍中的交付物
+ * @param {string} teamId
+ * @param {string} openid
+ */
+async function getMemberDeliverables(teamId, openid) {
+  if (!teamId || !openid) return []
+  return await cache.withCache('getMemberDels_' + teamId + '_' + openid, 30000, async () => {
+    try {
+      return await cloud.queryCollection('deliverables', { teamId, userId: openid }, {
+        orderBy: { field: 'uploadedAt', direction: 'desc' }
+      })
+    } catch (e) {
+      console.warn('[db] 获取成员交付物失败', e)
+      return []
+    }
+  })
+}
+
+/**
+ * 获取某成员在某队伍中领取的任务
+ * @param {string} teamId
+ * @param {string} openid
+ */
+async function getMemberTasks(teamId, openid) {
+  if (!teamId || !openid) return []
+  return await cache.withCache('getMemberTasks_' + teamId + '_' + openid, 30000, async () => {
+    try {
+      const tasks = await cloud.queryCollection('tasks', { teamId, assigneeId: openid }, {
+        orderBy: { field: 'createdAt', direction: 'desc' }
+      })
+      // 兼容旧字段 assignee
+      if (!tasks || tasks.length === 0) {
+        const all = await cloud.queryCollection('tasks', { teamId }, {
+          orderBy: { field: 'createdAt', direction: 'desc' }
+        })
+        return (all || []).filter(t => t.assigneeId === openid || t.assignee === openid)
+      }
+      return tasks
+    } catch (e) {
+      console.warn('[db] 获取成员任务失败', e)
+      return []
+    }
+  })
+}
+
 // ============ 动态相关 ============
 
 async function getActivities(limit = 20, teamId) {
@@ -384,6 +432,8 @@ module.exports = {
   getDeliverables,
   getTeamDeliverables,
   uploadDeliverable,
+  getMemberDeliverables,
+  getMemberTasks,
   getActivities,
   getStats
 }

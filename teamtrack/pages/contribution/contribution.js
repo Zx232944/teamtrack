@@ -92,6 +92,26 @@ Page({
     teamSwitcher.goCreateTeam()
   },
 
+  // 跳转到队友详情页
+  goMemberDetail(e) {
+    const item = e.currentTarget.dataset.item || {}
+    const openid = item.openid || item.userId || ''
+    if (!openid) {
+      wx.showToast({ title: '无法查看该成员', icon: 'none' })
+      return
+    }
+    const params = [
+      'openid=' + openid,
+      'nickName=' + encodeURIComponent(item.nickName || ''),
+      'role=' + (item.role || 'member'),
+      'contribution=' + (item.contribution || 0),
+      'completedTasks=' + (item.completedTasks || 0),
+      'percentage=' + (item.percentage || 0),
+      'teamId=' + (this.data.currentTeamId || '')
+    ].join('&')
+    wx.navigateTo({ url: '/pages/memberDetail/memberDetail?' + params })
+  },
+
   async loadData() {
     const isFirstLoad = !this._loadedOnce
     if (isFirstLoad) this.setData({ loading: true })

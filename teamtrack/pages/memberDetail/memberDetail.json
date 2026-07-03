@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "skeleton": "/components/skeleton/skeleton"
+  },
+  "navigationBarTitleText": "队友状态",
+  "enablePullDownRefresh": true
+}
