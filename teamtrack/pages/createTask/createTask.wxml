@@ -53,6 +53,24 @@
         </view>
       </view>
     </view>
+
+    <view class="form-item">
+      <text class="form-label">任务附件（可选）</text>
+      <view class="attachment-add-btn" bindtap="onAddAttachment">
+        <text class="attachment-add-icon">+</text>
+        <text>添加附件</text>
+      </view>
+      <view wx:if="{{attachments.length > 0}}" class="attachment-list">
+        <view wx:for="{{attachments}}" wx:key="index" class="attachment-item">
+          <view class="attachment-icon">{{item.type === 'image' ? '🖼' : item.type === 'link' ? '🔗' : '📄'}}</view>
+          <view class="attachment-info flex-1">
+            <text class="attachment-name">{{item.fileName}}</text>
+            <text class="text-xs text-secondary">{{item.size}}</text>
+          </view>
+          <view class="attachment-remove" catchtap="onRemoveAttachment" data-index="{{index}}">×</view>
+        </view>
+      </view>
+    </view>
   </view>
 
   <view class="form-actions">

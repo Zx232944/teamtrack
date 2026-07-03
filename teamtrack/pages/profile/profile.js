@@ -6,10 +6,9 @@ Page({
   data: {
     user: {},
     isLoggedIn: false,
-    // 注册流程状态：'' | 'phone' | 'nickName'
+    // 注册流程状态：'' | 'nickName'
     registerStep: '',
-    tempNickName: '',
-    tempPhoneCode: ''
+    tempNickName: ''
   },
 
   onLoad() {
@@ -58,7 +57,7 @@ Page({
    * 点击"微信登录"按钮：
    * 调用 login 云函数检测是否已注册
    * - 已注册：直接登录成功
-   * - 未注册：进入注册流程，弹出手机号授权
+   * - 未注册：进入注册流程，设置昵称
    */
   async onLogin() {
     wx.showLoading({ title: '登录中...', mask: true })
@@ -67,8 +66,8 @@ Page({
       wx.hideLoading()
 
       if (result.isNew) {
-        // 新用户：进入注册流程
-        this.setData({ registerStep: 'phone' })
+        // 新用户：进入昵称设置
+        this.setData({ registerStep: 'nickName' })
         return
       }
 
@@ -84,39 +83,6 @@ Page({
     }
   },
 
-  /**
-   * 获取手机号回调（button open-type="getPhoneNumber"）
-   */
-  onGetPhoneNumber(e) {
-    if (e.detail.errMsg !== 'getPhoneNumber:ok') {
-      wx.showToast({ title: '已取消手机号授权', icon: 'none' })
-      return
-    }
-    this.setData({
-      tempPhoneCode: e.detail.code,
-      registerStep: 'nickName'
-    })
-  },
-
-  /**
-   * 跳过手机号授权（测试号或不想授权）
-   */
-  onSkipPhone() {
-    wx.showModal({
-      title: '提示',
-      content: '不授权手机号将无法在队伍中相互联系，确定跳过吗？',
-      confirmColor: '#FF6B35',
-      success: (res) => {
-        if (res.confirm) {
-          this.setData({
-            tempPhoneCode: '',
-            registerStep: 'nickName'
-          })
-        }
-      }
-    })
-  },
-
   onNickNameInput(e) {
     this.setData({ tempNickName: e.detail.value })
   },
@@ -125,7 +91,7 @@ Page({
    * 提交注册
    */
   async onSubmitRegister() {
-    const { tempNickName, tempPhoneCode } = this.data
+    const { tempNickName } = this.data
     const nickName = (tempNickName || '').trim()
     if (!nickName) {
       wx.showToast({ title: '请输入昵称', icon: 'none' })
@@ -133,13 +99,12 @@ Page({
     }
 
     try {
-      const user = await auth.register({ phoneCode: tempPhoneCode, nickName })
+      const user = await auth.register({ nickName })
       this.setData({
         user,
         isLoggedIn: true,
         registerStep: '',
-        tempNickName: '',
-        tempPhoneCode: ''
+        tempNickName: ''
       })
       wx.showToast({ title: '注册成功！', icon: 'success' })
     } catch (err) {
@@ -179,8 +144,7 @@ Page({
             user: {},
             isLoggedIn: false,
             registerStep: '',
-            tempNickName: '',
-            tempPhoneCode: ''
+            tempNickName: ''
           })
           wx.showToast({ title: '已退出登录', icon: 'success' })
           // 跳转到登录页（当前 profile 即登录页）

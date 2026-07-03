@@ -24,6 +24,7 @@ exports.main = async (event, context) => {
         captainId: openid,
         memberCount: 1,
         progress: 0,
+        currentStep: 1,
         inviteCode,
         createdAt: new Date()
       }

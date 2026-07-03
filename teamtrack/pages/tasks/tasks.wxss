@@ -111,7 +111,14 @@
 
 .task-footer-left {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4rpx;
+}
+
+.task-creator {
+  font-size: 22rpx;
+  margin-left: 60rpx;
 }
 
 .task-assignee {

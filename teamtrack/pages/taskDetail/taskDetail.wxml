@@ -19,6 +19,22 @@
     <view class="detail-content">{{task.description}}</view>
   </view>
 
+  <!-- 任务附件 -->
+  <view class="detail-section" wx:if="{{taskAttachments.length > 0}}">
+    <view class="detail-section-title">任务附件 ({{taskAttachments.length}})</view>
+    <view class="deliverable-list">
+      <view wx:for="{{taskAttachments}}" wx:key="index" class="deliverable-item" bindtap="onPreviewAttachment" data-item="{{item}}">
+        <view class="del-icon" style="background: {{item.iconColor}};">
+          <text>{{item.iconText}}</text>
+        </view>
+        <view class="del-info flex-1">
+          <text class="del-name">{{item.fileName}}</text>
+          <text class="text-xs text-secondary">{{item.size}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
   <!-- 截止时间 -->
   <view class="detail-section">
     <view class="detail-section-title">截止时间</view>

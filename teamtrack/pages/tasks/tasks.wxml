@@ -67,6 +67,7 @@
               <view class="assignee-avatar">{{item.assigneeName ? item.assigneeName[0] : '?'}}</view>
               <text class="text-sm text-secondary">{{item.assigneeName || '待领取'}}</text>
             </view>
+            <text class="task-creator text-xs text-secondary">由 {{item.createdByName || '未知'}} 发布</text>
           </view>
           <view class="task-footer-right">
             <text class="task-points text-orange font-bold">{{item.points}}分</text>

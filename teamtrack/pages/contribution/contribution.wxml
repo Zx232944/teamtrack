@@ -130,6 +130,8 @@
           <view class="del-info flex-1">
             <text class="del-name">{{item.fileName}}</text>
             <view class="del-meta">
+              <text class="text-xs text-secondary">{{item.userName || '未知'}}</text>
+              <text class="text-xs text-secondary">·</text>
               <text class="text-xs text-secondary">{{item.taskTitle}}</text>
               <text class="text-xs text-secondary">·</text>
               <text class="text-xs text-secondary">{{item.size}}</text>

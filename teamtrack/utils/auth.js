@@ -5,9 +5,8 @@
  * 1. login() 只查询是否已注册，不创建用户记录
  *    - 已注册：返回用户信息
  *    - 未注册：返回 { isNew: true, openid }，由页面引导走注册流程
- * 2. register({ phoneCode, nickName }) 完成新用户注册
- *    - 通过 button open-type="getPhoneNumber" 获取 phoneCode
- *    - 弹窗输入昵称
+ * 2. register({ nickName }) 完成新用户注册
+ *    - 页面输入昵称
  *    - 调用云函数 register 创建用户记录
  */
 
@@ -107,17 +106,16 @@ function login() {
 }
 
 /**
- * 注册新用户（获取手机号 + 设置昵称后调用）
+ * 注册新用户（设置昵称后调用）
  * @param {Object} param0
- * @param {string} param0.phoneCode - getPhoneNumber 回调拿到的 code
  * @param {string} param0.nickName - 用户输入的昵称
  */
-async function register({ phoneCode, nickName }) {
+async function register({ nickName }) {
   return new Promise((resolve, reject) => {
     wx.showLoading({ title: '注册中...', mask: true })
     wx.cloud.callFunction({
       name: 'register',
-      data: { phoneCode, nickName },
+      data: { nickName },
       success: (res) => {
         wx.hideLoading()
         if (res.result && res.result.code === 0) {
@@ -137,33 +135,6 @@ async function register({ phoneCode, nickName }) {
         wx.hideLoading()
         console.error('[auth] register 云函数调用失败', err)
         reject(new Error(err.errMsg || '注册失败，请检查云函数是否已部署'))
-      }
-    })
-  })
-}
-
-/**
- * 弹窗输入昵称
- */
-function promptNickName(placeholder) {
-  return new Promise((resolve, reject) => {
-    wx.showModal({
-      title: '设置昵称',
-      content: '请输入你在队伍中的昵称，方便队友认出你',
-      editable: true,
-      placeholderText: placeholder || '请输入昵称',
-      confirmColor: '#FF6B35',
-      success: (res) => {
-        if (res.confirm) {
-          const nickName = res.content && res.content.trim()
-          if (!nickName) {
-            reject(new Error('昵称不能为空'))
-            return
-          }
-          resolve(nickName)
-        } else {
-          reject(new Error('用户取消'))
-        }
       }
     })
   })
@@ -267,7 +238,6 @@ module.exports = {
   refreshUser,
   login,
   register,
-  promptNickName,
   updateUser,
   logout,
   checkLoginAndRedirect

@@ -1,5 +1,5 @@
 // 云函数：register
-// 完成新用户注册：获取手机号 + 设置昵称，创建用户记录
+// 完成新用户注册：设置昵称，创建用户记录
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -8,7 +8,7 @@ exports.main = async (event, context) => {
   const db = cloud.database()
 
   const openid = wxContext.OPENID || event.openid || ('dev_' + (event.tempId || 'default_user'))
-  const { phoneCode, nickName } = event
+  const { nickName } = event
 
   if (!nickName || !nickName.trim()) {
     return { code: -1, message: '请填写昵称' }
@@ -27,31 +27,11 @@ exports.main = async (event, context) => {
       }
     }
 
-    // 2. 通过 phoneCode 换取手机号（如果传了 code）
-    let phoneInfo = null
-    if (phoneCode) {
-      try {
-        const phoneResult = await cloud.openapi.phonenumber.getPhoneNumber({ code: phoneCode })
-        if (phoneResult.errCode === 0 && phoneResult.phoneInfo) {
-          phoneInfo = {
-            phoneNumber: phoneResult.phoneInfo.phoneNumber,
-            purePhoneNumber: phoneResult.phoneInfo.purePhoneNumber,
-            countryCode: phoneResult.phoneInfo.countryCode
-          }
-        }
-      } catch (e) {
-        console.warn('[register] 获取手机号失败', e)
-        // 测试号环境可能没权限，继续走流程，标记为未获取
-      }
-    }
-
-    // 3. 创建用户记录
+    // 2. 创建用户记录
     const newUser = {
       openid,
       nickName: nickName.trim(),
       avatarUrl: '',
-      phone: phoneInfo ? phoneInfo.phoneNumber : '',
-      phoneInfo: phoneInfo,
       role: 'member',
       contribution: 0,
       completedTasks: 0,

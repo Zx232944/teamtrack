@@ -6,28 +6,15 @@
     <view class="login-prompt" wx:if="{{!registerStep}}">
       <view class="login-avatar-placeholder">👤</view>
       <text class="login-title">登录队迹协作工具</text>
-      <text class="login-desc text-secondary">首次登录需授权手机号并设置昵称</text>
+      <text class="login-desc text-secondary">首次登录请设置昵称</text>
       <button class="btn-primary login-btn" bindtap="onLogin">微信登录</button>
-    </view>
-
-    <!-- 注册流程：获取手机号 -->
-    <view class="register-prompt" wx:if="{{registerStep === 'phone'}}">
-      <view class="register-card">
-        <view class="register-step-badge">第 1 / 2 步</view>
-        <text class="register-title">欢迎新用户</text>
-        <text class="register-desc text-secondary">请先授权手机号完成注册（用于队伍内联系）</text>
-        <button class="btn-primary login-btn" open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber">
-          授权手机号
-        </button>
-        <view class="register-skip" bindtap="onSkipPhone">暂不授权，跳过</view>
-      </view>
     </view>
 
     <!-- 注册流程：设置昵称 -->
     <view class="register-prompt" wx:if="{{registerStep === 'nickName'}}">
       <view class="register-card">
-        <view class="register-step-badge">第 2 / 2 步</view>
-        <text class="register-title">设置昵称</text>
+        <view class="register-icon">👋</view>
+        <text class="register-title">欢迎加入队迹</text>
         <text class="register-desc text-secondary">请输入你在队伍中的昵称，方便队友认出你</text>
         <input class="register-input" placeholder="请输入昵称" value="{{tempNickName}}" bindinput="onNickNameInput" maxlength="20" focus="{{true}}" />
         <button class="btn-primary login-btn" bindtap="onSubmitRegister">完成注册</button>

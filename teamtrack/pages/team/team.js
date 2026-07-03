@@ -6,13 +6,14 @@ Page({
     team: null,
     members: [],
     inviteCode: '------',
+    isCaptain: false,
     timeline: [
-      { step: 1, title: '队伍组建', date: '待定', done: false, current: true },
-      { step: 2, title: '需求分析', date: '待定', done: false, current: false },
-      { step: 3, title: '方案设计', date: '待定', done: false, current: false },
-      { step: 4, title: '开发实施', date: '待定', done: false, current: false },
-      { step: 5, title: '测试优化', date: '待定', done: false, current: false },
-      { step: 6, title: '提交参赛', date: '待定', done: false, current: false }
+      { step: 1, title: '队伍组建', statusText: '待开始', done: false, current: false },
+      { step: 2, title: '需求分析', statusText: '待开始', done: false, current: false },
+      { step: 3, title: '方案设计', statusText: '待开始', done: false, current: false },
+      { step: 4, title: '开发实施', statusText: '待开始', done: false, current: false },
+      { step: 5, title: '测试优化', statusText: '待开始', done: false, current: false },
+      { step: 6, title: '提交参赛', statusText: '待开始', done: false, current: false }
     ],
     loading: true
   },
@@ -38,21 +39,27 @@ Page({
         return
       }
 
-      // 计算队伍进度
+      // 计算队伍进度（用于"完成度"显示，与时间线无关）
       const tasks = await DB.getTasks({ status: 'all' })
       const completedCount = tasks.filter(t => t.status === 'completed').length
       team.progress = tasks.length > 0
         ? Math.round((completedCount / tasks.length) * 100)
         : 0
 
-      // 根据进度更新时间线
-      const progressPercent = team.progress
-      const timeline = this.data.timeline.map((item, index) => {
-        const stepProgress = (index + 1) / 6 * 100
+      // 判断当前用户是否为队长
+      const openid = wx.getStorageSync('openid')
+      const isCaptain = team.captainId === openid
+
+      // 时间线：基于队长设置的 currentStep 计算 done/current
+      const currentStep = team.currentStep || 1
+      const timeline = this.data.timeline.map((item) => {
+        const done = item.step < currentStep
+        const current = item.step === currentStep
         return {
           ...item,
-          done: progressPercent >= stepProgress,
-          current: progressPercent >= (index) / 6 * 100 && progressPercent < stepProgress
+          done,
+          current,
+          statusText: current ? '进行中' : (done ? '已完成' : '待开始')
         }
       })
 
@@ -66,6 +73,7 @@ Page({
         team,
         members: processedMembers,
         inviteCode: team.inviteCode || '------',
+        isCaptain,
         timeline,
         loading: false
       })
@@ -73,6 +81,43 @@ Page({
       console.error('加载队伍信息失败', err)
       this.setData({ loading: false })
     }
+  },
+
+  // 队长点击时间线设置当前步骤
+  onTimelineTap(e) {
+    if (!this.data.isCaptain) {
+      wx.showToast({ title: '只有队长可以修改进度', icon: 'none' })
+      return
+    }
+    const step = e.currentTarget.dataset.step
+    const title = e.currentTarget.dataset.title
+    const currentStep = (this.data.team && this.data.team.currentStep) || 1
+
+    if (step === currentStep) {
+      wx.showToast({ title: '已是当前步骤', icon: 'none' })
+      return
+    }
+
+    const action = step < currentStep ? '回退' : '推进'
+    wx.showModal({
+      title: `${action}到第${step}步`,
+      content: `确定将当前进度设置为「${title}」吗？`,
+      confirmColor: '#FF6B35',
+      success: async (res) => {
+        if (res.confirm) {
+          wx.showLoading({ title: '更新中...', mask: true })
+          try {
+            await DB.updateTeam(this.data.team._id, { currentStep: step })
+            wx.hideLoading()
+            wx.showToast({ title: '已更新', icon: 'success' })
+            this.loadData()
+          } catch (err) {
+            wx.hideLoading()
+            wx.showToast({ title: err.message || '更新失败', icon: 'none' })
+          }
+        }
+      }
+    })
   },
 
   // 复制邀请码

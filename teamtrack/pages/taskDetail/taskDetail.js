@@ -7,6 +7,7 @@ Page({
   data: {
     task: null,
     deliverables: [],
+    taskAttachments: [],
     countdown: {},
     uploading: false
   },
@@ -48,6 +49,12 @@ Page({
         return { ...d, iconText: icon.text, iconColor: icon.color }
       })
 
+      const processedAttachments = (task.attachments || []).map(a => {
+        const ext = (a.fileName || '').split('.').pop().toLowerCase()
+        const icon = fileIcons[ext] || fileIcons.default
+        return { ...a, iconText: icon.text, iconColor: icon.color }
+      })
+
       this.setData({
         task: {
           ...task,
@@ -55,6 +62,7 @@ Page({
           statusClass: util.getStatusClass(task.status)
         },
         deliverables: processedDels,
+        taskAttachments: processedAttachments,
         countdown
       })
     } catch (err) {
@@ -211,36 +219,38 @@ Page({
     }
   },
 
-  // 预览/下载交付物
-  async onPreviewDeliverable(e) {
-    const deliverable = e.currentTarget.dataset.item
-
+  // 统一预览方法：归一化参数 { fileName, fileID, fileUrl, isLink }
+  async previewFile(file) {
     // 1. 在线链接类型：复制链接或直接打开
-    if (deliverable.isLink && deliverable.fileUrl) {
-      this.openLink(deliverable.fileUrl)
+    if (file.isLink && file.fileUrl) {
+      this.openLink(file.fileUrl)
       return
     }
     // 兼容旧数据：链接存在 fileName 中（"名称 | 链接"）
-    if (!deliverable.fileID && deliverable.fileName && deliverable.fileName.indexOf(' | ') !== -1) {
-      const link = deliverable.fileName.split(' | ')[1]
+    if (!file.fileID && file.fileName && file.fileName.indexOf(' | ') !== -1) {
+      const link = file.fileName.split(' | ')[1]
       this.openLink(link)
       return
     }
 
-    // 2. 无 fileID 的模拟数据
-    if (!deliverable.fileID) {
-      wx.showToast({ title: '该交付物无文件可预览', icon: 'none' })
+    // 2. 无 fileID 且无链接
+    if (!file.fileID) {
+      if (file.fileUrl) {
+        this.openLink(file.fileUrl)
+        return
+      }
+      wx.showToast({ title: '该文件无预览内容', icon: 'none' })
       return
     }
 
     // 3. 图片类型：使用 wx.previewImage 全屏预览
     const imgExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp']
-    const ext = (deliverable.fileName || '').split('.').pop().toLowerCase()
+    const ext = (file.fileName || '').split('.').pop().toLowerCase()
     if (imgExt.indexOf(ext) !== -1) {
       wx.showLoading({ title: '加载图片...' })
       try {
         const cloud = require('../../utils/cloud')
-        const tempUrl = await cloud.getTempFileURL(deliverable.fileID)
+        const tempUrl = await cloud.getTempFileURL(file.fileID)
         wx.hideLoading()
         wx.previewImage({
           current: tempUrl,
@@ -267,7 +277,7 @@ Page({
     wx.showLoading({ title: saveToAlbum ? '保存中...' : '下载文件...', mask: true })
     try {
       const cloud = require('../../utils/cloud')
-      const tempUrl = await cloud.getTempFileURL(deliverable.fileID)
+      const tempUrl = await cloud.getTempFileURL(file.fileID)
       wx.downloadFile({
         url: tempUrl,
         success: (res) => {
@@ -297,6 +307,28 @@ Page({
       wx.hideLoading()
       this.showFileError(err.message || '获取文件失败')
     }
+  },
+
+  // 预览/下载交付物（归一化后调 previewFile）
+  onPreviewDeliverable(e) {
+    const d = e.currentTarget.dataset.item || {}
+    this.previewFile({
+      fileName: d.fileName,
+      fileID: d.fileID,
+      fileUrl: d.fileUrl,
+      isLink: !!d.isLink
+    })
+  },
+
+  // 预览任务附件（附件用 type==='link' 标识链接，归一化为 isLink）
+  onPreviewAttachment(e) {
+    const a = e.currentTarget.dataset.item || {}
+    this.previewFile({
+      fileName: a.fileName,
+      fileID: a.fileID,
+      fileUrl: a.fileUrl,
+      isLink: a.type === 'link'
+    })
   },
 
   // 保存到本地（图片走相册，其他文件走文档管理器）

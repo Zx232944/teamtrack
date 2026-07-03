@@ -11,6 +11,16 @@ exports.main = async (event, context) => {
   const openid = wxContext.OPENID || event.openid || 'dev_default_user'
 
   try {
+    // 1. 先查 user 拿 userName（供 task 冗余 createdByName 和 activity 复用）
+    let userName = '微信用户'
+    try {
+      const userRes = await db.collection('users').where({ openid }).get()
+      if (userRes.data.length > 0) {
+        userName = userRes.data[0].nickName
+      }
+    } catch (e) {}
+
+    // 2. 创建任务（冗余 createdByName 便于前端直接展示）
     const result = await db.collection('tasks').add({
       data: {
         teamId: event.teamId,
@@ -24,20 +34,13 @@ exports.main = async (event, context) => {
         points: event.points || 10,
         deliverables: 0,
         createdBy: openid,
+        createdByName: userName,
+        attachments: event.attachments || [],
         createdAt: new Date()
       }
     })
 
-    // 获取用户名
-    let userName = '微信用户'
-    try {
-      const userRes = await db.collection('users').where({ openid }).get()
-      if (userRes.data.length > 0) {
-        userName = userRes.data[0].nickName
-      }
-    } catch (e) {}
-
-    // 记录动态
+    // 3. 记录动态（复用已查到的 userName）
     try {
       await db.collection('activities').add({
         data: {

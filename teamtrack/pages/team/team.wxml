@@ -38,14 +38,19 @@
 
   <!-- 时间线 -->
   <view class="section" wx:if="{{team}}">
-    <view class="section-title">竞赛时间线</view>
+    <view class="section-header">
+      <text class="section-title">竞赛时间线</text>
+      <text wx:if="{{isCaptain}}" class="text-xs text-secondary">点击设置进度</text>
+    </view>
     <view class="timeline">
-      <view wx:for="{{timeline}}" wx:key="step" class="timeline-item {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}}">
+      <view wx:for="{{timeline}}" wx:key="step"
+        class="timeline-item {{item.done ? 'done' : ''}} {{item.current ? 'current' : ''}} {{isCaptain ? 'clickable' : ''}}"
+        bindtap="onTimelineTap" data-step="{{item.step}}" data-title="{{item.title}}">
         <view class="timeline-dot"></view>
         <view class="timeline-content">
           <text class="timeline-step text-sm text-secondary">步骤 {{item.step}}</text>
           <text class="timeline-title">{{item.title}}</text>
-          <text class="timeline-date text-xs text-secondary">{{item.date}}</text>
+          <text class="timeline-date text-xs text-secondary">{{item.statusText}}</text>
         </view>
       </view>
     </view>

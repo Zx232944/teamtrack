@@ -157,6 +157,17 @@ async function quitTeam(teamId) {
   return res
 }
 
+/**
+ * 队长更新队伍信息（当前仅 currentStep 时间线进度）
+ * @param {string} teamId
+ * @param {Object} data { currentStep }
+ */
+async function updateTeam(teamId, data) {
+  const res = await cloud.callFunction('updateTeam', { teamId, ...data })
+  appStore.invalidateTeams()
+  return res
+}
+
 // ============ 任务相关 ============
 
 async function getTasks(filter = {}, teamId) {
@@ -424,6 +435,7 @@ module.exports = {
   createTeam,
   joinTeam,
   quitTeam,
+  updateTeam,
   getTasks,
   getTaskDetail,
   createTask,

@@ -193,11 +193,11 @@
       <view wx:for="{{activities}}" wx:key="_id" class="activity-item">
         <view class="activity-dot {{item.type}}"></view>
         <view class="flex-1">
-          <text class="text-sm">{{item.user}}</text>
+          <text class="text-sm">{{item.userName}}</text>
           <text class="text-sm text-secondary">{{item.typeText}}</text>
           <text class="text-sm">{{item.taskTitle}}</text>
         </view>
-        <text class="text-xs text-secondary">{{item.time}}</text>
+        <text class="text-xs text-secondary">{{item.timeText}}</text>
       </view>
     </view>
   </view>

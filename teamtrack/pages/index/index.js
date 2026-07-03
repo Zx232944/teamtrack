@@ -195,7 +195,8 @@ Page({
       }
       const processedActivities = activities.map(a => ({
         ...a,
-        typeText: activityTypeMap[a.type] || ''
+        typeText: activityTypeMap[a.type] || '',
+        timeText: util.formatDateTime(a.time)
       }))
 
       this.setData({
