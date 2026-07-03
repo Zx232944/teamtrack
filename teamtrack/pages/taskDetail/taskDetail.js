@@ -87,7 +87,7 @@ Page({
 
   onUpload() {
     wx.showActionSheet({
-      itemList: ['选择文件上传', '填写在线文档链接', '拍照上传'],
+      itemList: ['选择文件上传', '填写在线文档链接', '图片上传'],
       success: (res) => {
         if (res.tapIndex === 0) {
           this.chooseFile()
@@ -100,11 +100,11 @@ Page({
     })
   },
 
-  // 选择文件上传
+  // 选择文件（微信内置选择器，真机顶部有「聊天/收藏/手机文件」tab可切换来源）
   chooseFile() {
     wx.chooseMessageFile({
       count: 1,
-      type: 'file',
+      type: 'all',
       success: (res) => {
         const file = res.tempFiles[0]
         this.doUpload(file.name, file.path, file.size)
